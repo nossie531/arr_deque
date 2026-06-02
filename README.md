@@ -34,5 +34,5 @@ This crate focuses on the following.
 See [CHANGELOG](CHANGELOG.md).
 
 <!-- links -->
-[`ArrDeque`]: https://docs.rs/arr_deque/0.1.1/arr_deque/struct.ArrDeque.html
+[`ArrDeque`]: https://docs.rs/arr_deque/0.1.2/arr_deque/struct.ArrDeque.html
 [`VecDeque`]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
