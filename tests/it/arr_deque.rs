@@ -859,15 +859,14 @@ fn default() {
 #[test]
 fn drop() {
     when_normal();
-    when_wrap();
+    when_wrapped_then_drop_items_collect_order();
 
     fn when_normal() {
         let target = ts::deque::normal();
         mem::drop(target);
     }
 
-    // Check drop order of items with ring buffer wrapping.
-    fn when_wrap() {
+    fn when_wrapped_then_drop_items_collect_order() {
         // Arrange.
         let target = ArrDeque::<_, { ts::CAPACITY }>::new();
         let mut target = ch::adjust_ring_start(target, ch::RingBufAlign::Wrap);
