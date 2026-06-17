@@ -1,8 +1,9 @@
 use crate::for_test::*;
 use arr_deque::prelude::*;
-use core::ops::{Index, IndexMut};
-use core::{iter, mem};
+use drop_tracer::prelude::*;
 use std::io::{BufRead, Read, Write};
+use std::ops::{Index, IndexMut};
+use std::{iter, mem};
 use test_panic::TestPanicResult;
 use test_panic::prelude::*;
 
@@ -314,68 +315,156 @@ fn binary_search_by_key() {
 
 #[test]
 fn clear() {
-    let target = &mut ts::deque::normal();
-    target.clear();
-    assert!(target.is_empty());
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let target = &mut ts::deque::normal();
+        target.clear();
+        assert!(target.is_empty());
+    }
+
+    fn when_impl_drop_for_item() {
+        // Arrange.
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_back(tracer.trace(ts::VAL));
+        // Act.
+        target.clear();
+        // Assert.
+        assert_eq!(tracer.living_count(), 0);
+    }
 }
 
 #[test]
 fn pop_front() {
-    for ref mut target in ts::deques::all() {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        for ref mut target in ts::deques::all() {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = target.pop_front();
+            let tobe = master.pop_front();
+            // Assert.
+            assert_eq!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_front(tracer.trace(ts::VAL));
         // Act.
-        let asis = target.pop_front();
-        let tobe = master.pop_front();
+        let result = target.pop_front();
         // Assert.
-        assert_eq!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 1);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 0);
     }
 }
 
 #[test]
 fn pop_back() {
-    for ref mut target in ts::deques::all() {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        for ref mut target in ts::deques::all() {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = target.pop_back();
+            let tobe = master.pop_back();
+            // Assert.
+            assert_eq!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_back(tracer.trace(ts::VAL));
         // Act.
-        let asis = target.pop_back();
-        let tobe = master.pop_back();
+        let result = target.pop_back();
         // Assert.
-        assert_eq!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 1);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 0);
     }
 }
 
 #[test]
 fn pop_front_if() {
-    let targets = ts::deques::all_for_binary_search();
-    let patterns = ts::deque_vs::each_predicates_mut;
-    for (ref mut target, predicate) in targets.flat_map(patterns) {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let targets = ts::deques::all_for_binary_search();
+        let patterns = ts::deque_vs::each_predicates_mut;
+        for (ref mut target, predicate) in targets.flat_map(patterns) {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = target.pop_front_if(|x| predicate(x));
+            let tobe = master.pop_front_if(|x| predicate(x));
+            // Assert.
+            assert_eq!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_front(tracer.trace(ts::VAL));
         // Act.
-        let asis = target.pop_front_if(|x| predicate(x));
-        let tobe = master.pop_front_if(|x| predicate(x));
+        let result = target.pop_front_if(|_| true);
         // Assert.
-        assert_eq!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 1);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 0);
     }
 }
 
 #[test]
 fn pop_back_if() {
-    let targets = ts::deques::all_for_binary_search();
-    let patterns = ts::deque_vs::each_predicates_mut;
-    for (ref mut target, predicate) in targets.flat_map(patterns) {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let targets = ts::deques::all_for_binary_search();
+        let patterns = ts::deque_vs::each_predicates_mut;
+        for (ref mut target, predicate) in targets.flat_map(patterns) {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = target.pop_back_if(|x| predicate(x));
+            let tobe = master.pop_back_if(|x| predicate(x));
+            // Assert.
+            assert_eq!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_back(tracer.trace(ts::VAL));
         // Act.
-        let asis = target.pop_back_if(|x| predicate(x));
-        let tobe = master.pop_back_if(|x| predicate(x));
+        let result = target.pop_back_if(|_| true);
         // Assert.
-        assert_eq!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 1);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 0);
     }
 }
 
@@ -491,17 +580,35 @@ fn push_back_mut() {
 
 #[test]
 fn remove() {
-    let targets = ts::deques::none_emptys();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let targets = ts::deques::none_emptys();
+        let patterns = ts::deque_vs::each_indicies;
+        for (ref mut target, index) in targets.flat_map(patterns) {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = test_panic(|| target.remove(index));
+            let tobe = test_panic(|| master.remove(index));
+            // Assert.
+            assert_eqn!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_back(tracer.trace(ts::VAL));
         // Act.
-        let asis = test_panic(|| target.remove(index));
-        let tobe = test_panic(|| master.remove(index));
+        let result = target.remove(0);
         // Assert.
-        assert_eqn!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 1);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 0);
     }
 }
 
@@ -553,33 +660,71 @@ fn swap() {
 
 #[test]
 fn swap_remove_front() {
-    let targets = ts::deques::looses();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let targets = ts::deques::looses();
+        let patterns = ts::deque_vs::each_indicies;
+        for (ref mut target, index) in targets.flat_map(patterns) {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = target.swap_remove_front(index);
+            let tobe = master.swap_remove_front(index);
+            // Assert.
+            assert_eq!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_back(tracer.trace(ts::VAL));
+        target.push_back(tracer.trace(ts::VAL));
         // Act.
-        let asis = target.swap_remove_front(index);
-        let tobe = master.swap_remove_front(index);
+        let result = target.swap_remove_front(1);
         // Assert.
-        assert_eq!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 2);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 1);
     }
 }
 
 #[test]
 fn swap_remove_back() {
-    let targets = ts::deques::looses();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let targets = ts::deques::looses();
+        let patterns = ts::deque_vs::each_indicies;
+        for (ref mut target, index) in targets.flat_map(patterns) {
+            // Arrange.
+            let master = &mut ch::vec_deque(&target);
+            // Act.
+            let asis = target.swap_remove_back(index);
+            let tobe = master.swap_remove_back(index);
+            // Assert.
+            assert_eq!(asis, tobe);
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.push_back(tracer.trace(ts::VAL));
+        target.push_back(tracer.trace(ts::VAL));
         // Act.
-        let asis = target.swap_remove_back(index);
-        let tobe = master.swap_remove_back(index);
+        let result = target.swap_remove_back(0);
         // Assert.
-        assert_eq!(asis, tobe);
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), 2);
+        mem::drop(result);
+        assert_eq!(tracer.living_count(), 1);
     }
 }
 
@@ -617,16 +762,32 @@ fn rotate_right() {
 
 #[test]
 fn truncate() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    when_normal();
+    when_impl_drop_for_item();
+
+    fn when_normal() {
+        let targets = ts::deques::all();
+        let patterns = ts::deque_vs::each_indicies;
+        for (ref mut target, index) in targets.flat_map(patterns) {
+            // Arrange.
+            let master = &mut ch::vec_deque(target);
+            // Act.
+            target.truncate(index);
+            master.truncate(index);
+            // Assert.
+            assert!(target.iter().eq(master.iter()));
+        }
+    }
+
+    fn when_impl_drop_for_item() {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let tracer = &DropTracer::new();
+        let target = &mut ts::deque::empty_of();
+        target.extend(iter::repeat_with(|| tracer.trace(ts::VAL)).take(ts::NORMAL_LEN));
         // Act.
-        target.truncate(index);
-        master.truncate(index);
+        target.truncate(ts::NORMAL_LEN / 2);
         // Assert.
-        assert!(target.iter().eq(master.iter()));
+        assert_eq!(tracer.living_count(), ts::NORMAL_LEN / 2);
     }
 }
 
@@ -868,16 +1029,21 @@ fn drop() {
 
     fn when_wrapped_then_drop_items_collect_order() {
         // Arrange.
-        let target = ArrDeque::<_, { ts::CAPACITY }>::new();
+        let tracer = &DropTracer::new();
+        let target = ts::deque::empty_of();
         let mut target = ch::adjust_ring_start(target, ch::RingBufAlign::Wrap);
-        let mut logger = tu::DropLogger::new();
-        target.extend(iter::repeat_with(|| logger.create_item()).take(ts::NORMAL_LEN));
+        let vals = Vec::from_iter((0..ts::NORMAL_LEN).map(|_| tracer.trace(ts::VAL)));
+        let tags = Vec::from_iter(vals.iter().map(|x| TraceVal::tag(&x)));
+        target.extend(vals);
 
         // Act.
         mem::drop(target);
 
         // Assert.
-        assert!(logger.logs().is_sorted());
+        let logs = tracer.logs();
+        let drop_logs = logs.iter().filter(|x| !x.is_alloc());
+        let drop_tags = drop_logs.map(|x| x.tag().clone());
+        assert!(drop_tags.eq(tags));
     }
 }
 
@@ -951,7 +1117,7 @@ fn from() {
         let vec = Vec::<i32>::from_iter(tu::random_iter().take(LEN));
         let arr = <[_; LEN]>::try_from(vec).unwrap();
         // Act.
-        let result = ArrDeque::<_, { ts::CAPACITY }>::from(arr.clone());
+        let result = ts::SampleDeque::from(arr.clone());
         // Assert.
         assert!(result.iter().eq(arr.iter()));
     }
@@ -961,7 +1127,7 @@ fn from() {
         let len = ts::CAPACITY / 2;
         let vec = Vec::<i32>::from_iter(tu::random_iter().take(len));
         // Act.
-        let result = ArrDeque::<_, { ts::CAPACITY }>::from(vec.clone());
+        let result = ts::SampleDeque::from(vec.clone());
         // Assert.
         assert!(result.iter().eq(vec.iter()));
     }
@@ -972,7 +1138,7 @@ fn from() {
         let vec = Vec::<i32>::from_iter(tu::random_iter().take(LEN));
         let arr = <[_; LEN]>::try_from(vec).unwrap();
         // Act.
-        let result = test_panic(|| ArrDeque::<_, { ts::CAPACITY }>::from(arr.clone()));
+        let result = test_panic(|| ts::SampleDeque::from(arr.clone()));
         // Assert.
         assert!(result.is_panic());
     }
@@ -982,7 +1148,7 @@ fn from() {
         let len = ts::CAPACITY + 1;
         let vec = Vec::<i32>::from_iter(tu::random_iter().take(len));
         // Act.
-        let result = test_panic(|| ArrDeque::<_, { ts::CAPACITY }>::from(vec.clone()));
+        let result = test_panic(|| ts::SampleDeque::from(vec.clone()));
         // Assert.
         assert!(result.is_panic());
     }

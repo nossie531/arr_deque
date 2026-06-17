@@ -48,12 +48,12 @@ pub(crate) fn range_prod(rx: &Range<usize>, ry: &Range<usize>) -> Range<usize> {
 }
 
 /// Returns capped range.
-pub(crate) fn range_cap<R>(range: R, bounds: RangeTo<usize>) -> Range<usize>
+pub(crate) fn range_cap<R>(range: &R, bounds: &RangeTo<usize>) -> Range<usize>
 where
     R: RangeBounds<usize>,
 {
-    let rx = rv::new(&range).to_univ();
-    let ry = rv::new(&bounds).to_univ();
+    let rx = rv::new(range).to_univ();
+    let ry = rv::new(bounds).to_univ();
     (rx & ry).to_range()
 }
 

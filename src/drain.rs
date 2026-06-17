@@ -40,7 +40,7 @@ impl<'a, T: 'a, const N: usize> Drain<'a, T, N> {
 
 impl<T, const N: usize> Drop for Drain<'_, T, N> {
     fn drop(&mut self) {
-        self.target.clear_range(self.range.clone());
+        self.target.clear_range(&self.range, true);
     }
 }
 

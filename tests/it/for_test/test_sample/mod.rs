@@ -1,13 +1,13 @@
-pub mod deque;
-pub mod deque_pairs;
-pub mod deque_vs;
-pub mod deques;
-pub mod drains;
-pub mod iters;
-pub use deque_builder::*;
-pub use drain_builder::*;
-pub use funcs::*;
-pub use iter_builder::*;
+pub(crate) mod deque;
+pub(crate) mod deque_pairs;
+pub(crate) mod deque_vs;
+pub(crate) mod deques;
+pub(crate) mod drains;
+pub(crate) mod iters;
+pub(crate) use deque_builder::*;
+pub(crate) use drain_builder::*;
+pub(crate) use funcs::*;
+pub(crate) use iter_builder::*;
 
 pub const VAL: i32 = 42;
 pub const QUANT_SIZE: i32 = 10;

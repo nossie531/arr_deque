@@ -44,7 +44,7 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
             return None;
         };
 
-        self.inner.clear_range(0..n);
+        self.inner.clear_range(&(0..n), true);
         self.inner.pop_front()
     }
 
@@ -75,7 +75,7 @@ impl<T, const N: usize> DoubleEndedIterator for IntoIter<T, N> {
         };
 
         let skipped_range = (self.inner.len() - n)..self.inner.len();
-        self.inner.clear_range(skipped_range);
+        self.inner.clear_range(&skipped_range, true);
         self.inner.pop_back()
     }
 }

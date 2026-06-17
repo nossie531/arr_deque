@@ -887,7 +887,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         }
 
         let removing = unsafe { self.copy_buf_val(self.to_buf_idx(index)) };
-        self.clear_range(index..index + 1);
+        self.clear_range(&(index..=index), false);
         Some(removing)
     }
 
@@ -1477,13 +1477,22 @@ impl<T, const N: usize> ArrDeque<T, N> {
 
 /// Crate public methods.
 impl<T, const N: usize> ArrDeque<T, N> {
-    /// Clears elements in given range.
-    pub(crate) fn clear_range<R>(&mut self, range: R)
+    /// Returns an item.
+    ///
+    /// # Safety
+    ///
+    /// This methods copy value. So be careful about aliasing rules.
+    pub(crate) unsafe fn copy_val(&self, index: DeqIdx) -> T {
+        unsafe { self.copy_buf_val(self.to_buf_idx(index)) }
+    }
+
+    /// Clear elements in given range.
+    pub(crate) fn clear_range<R>(&mut self, range: &R, drop: bool)
     where
         R: RangeBounds<usize>,
     {
         let rx = &self.all();
-        let ry = &util::range_cap(range, ..self.len);
+        let ry = &util::range_cap(range, &..self.len);
         let target = &util::range_prod(rx, ry);
         let rests = &util::range_diff(rx, ry);
         let slim_dir = Dir::dec(rests[0].len() <= rests[1].len());
@@ -1491,10 +1500,12 @@ impl<T, const N: usize> ArrDeque<T, N> {
         let start_offset = slim_dir.not().binary() * target.len();
 
         // Drop items.
-        for i in target.clone() {
-            let buf_idx = self.to_buf_idx(i);
-            let item = unsafe { self.copy_buf_val(buf_idx) };
-            mem::drop(item);
+        if drop {
+            for i in target.clone() {
+                let buf_idx = self.to_buf_idx(i);
+                let item = unsafe { self.copy_buf_val(buf_idx) };
+                mem::drop(item);
+            }
         }
 
         // Slide slim range.
@@ -1504,15 +1515,6 @@ impl<T, const N: usize> ArrDeque<T, N> {
         // Adjust fields.
         self.len -= target.len();
         self.start = util::add_mod(self.start, start_offset, N);
-    }
-
-    /// Returns an item.
-    ///
-    /// # Safety
-    ///
-    /// This methods copy value. So be careful about aliasing rules.
-    pub(crate) unsafe fn copy_val(&self, index: DeqIdx) -> T {
-        unsafe { self.copy_buf_val(self.to_buf_idx(index)) }
     }
 }
 
@@ -1905,7 +1907,7 @@ impl<const N: usize> BufRead for ArrDeque<u8, N> {
     #[inline]
     fn consume(&mut self, amt: usize) {
         assert!(amt <= self.len());
-        self.clear_range(..amt);
+        self.clear_range(&..amt, false);
     }
 }
 
@@ -1914,7 +1916,7 @@ impl<const N: usize> Read for ArrDeque<u8, N> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let (ref mut slice_this_time, _) = self.as_slices();
         let count = Read::read(slice_this_time, buf)?;
-        self.clear_range(..count);
+        self.clear_range(&..count, false);
         Ok(count)
     }
 }
