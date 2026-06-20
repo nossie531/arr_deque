@@ -10,14 +10,14 @@ keywords = ["deque"]
 categories = ["no-std", "data-structures"]
 
 [dependencies]
-rich_range = "0.2"
+rich_range = "0.3"
 subject = "0.1"
 
 [dev-dependencies]
 rand = "0.9"
 rand_pcg = "0.9"
 test_panic = "0.8"
-drop_tracer = "0.3"
+drop_tracer = "0.5"
 
 [features]
 default = ["std"]

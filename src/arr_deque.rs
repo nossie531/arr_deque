@@ -887,7 +887,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         }
 
         let removing = unsafe { self.copy_buf_val(self.to_buf_idx(index)) };
-        self.clear_range(&(index..=index), false);
+        self.clear_elements_without_drops(&(index..=index));
         Some(removing)
     }
 
@@ -1122,9 +1122,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// assert_eq!(buf, [5]);
     /// ```
     pub fn truncate(&mut self, len: usize) {
-        if self.len > len {
-            drop(self.drain(len..));
-        }
+        self.clear_elements(&(len..));
     }
 
     /// Splits the deque into two at the given index.
@@ -1477,7 +1475,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
 
 /// Crate public methods.
 impl<T, const N: usize> ArrDeque<T, N> {
-    /// Returns an item.
+    /// Returns an element.
     ///
     /// # Safety
     ///
@@ -1487,7 +1485,16 @@ impl<T, const N: usize> ArrDeque<T, N> {
     }
 
     /// Clear elements in given range.
-    pub(crate) fn clear_range<R>(&mut self, range: &R, drop: bool)
+    pub(crate) fn clear_elements<R>(&mut self, range: &R)
+    where
+        R: RangeBounds<usize>,
+    {
+        self.drop_elements(range);
+        self.clear_elements_without_drops(range);
+    }
+
+    /// Clear elements in given range without drop call.
+    pub(crate) fn clear_elements_without_drops<R>(&mut self, range: &R)
     where
         R: RangeBounds<usize>,
     {
@@ -1499,15 +1506,6 @@ impl<T, const N: usize> ArrDeque<T, N> {
         let slim_range = &rests[slim_dir.binary()];
         let start_offset = slim_dir.not().binary() * target.len();
 
-        // Drop items.
-        if drop {
-            for i in target.clone() {
-                let buf_idx = self.to_buf_idx(i);
-                let item = unsafe { self.copy_buf_val(buf_idx) };
-                mem::drop(item);
-            }
-        }
-
         // Slide slim range.
         let offset = Offset::new(!slim_dir, target.len());
         self.slide_range(slim_range, offset);
@@ -1515,6 +1513,20 @@ impl<T, const N: usize> ArrDeque<T, N> {
         // Adjust fields.
         self.len -= target.len();
         self.start = util::add_mod(self.start, start_offset, N);
+    }
+
+    /// Drop elements in given range.
+    pub(crate) fn drop_elements<R>(&mut self, range: &R)
+    where
+        R: RangeBounds<usize>,
+    {
+        let rx = &self.all();
+        let ry = &util::range_cap(range, &..self.len);
+        for i in util::range_prod(rx, ry) {
+            let buf_idx = self.to_buf_idx(i);
+            let element = unsafe { self.copy_buf_val(buf_idx) };
+            mem::drop(element);
+        }
     }
 }
 
@@ -1907,7 +1919,7 @@ impl<const N: usize> BufRead for ArrDeque<u8, N> {
     #[inline]
     fn consume(&mut self, amt: usize) {
         assert!(amt <= self.len());
-        self.clear_range(&..amt, false);
+        self.clear_elements_without_drops(&..amt);
     }
 }
 
@@ -1916,7 +1928,7 @@ impl<const N: usize> Read for ArrDeque<u8, N> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let (ref mut slice_this_time, _) = self.as_slices();
         let count = Read::read(slice_this_time, buf)?;
-        self.clear_range(&..count, false);
+        self.clear_elements_without_drops(&..count);
         Ok(count)
     }
 }

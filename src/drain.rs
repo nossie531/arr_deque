@@ -16,14 +16,11 @@ pub struct Drain<'a, T: 'a, const N: usize> {
     /// Target deque.
     target: &'a mut ArrDeque<T, N>,
 
-    /// Range to drain.
+    /// Original range.
     range: Range<usize>,
 
-    /// Drained item count from front.
-    drained_front: usize,
-
-    /// Drained item count from back.
-    drained_back: usize,
+    /// Current range.
+    curr: Range<usize>,
 }
 
 impl<'a, T: 'a, const N: usize> Drain<'a, T, N> {
@@ -31,16 +28,16 @@ impl<'a, T: 'a, const N: usize> Drain<'a, T, N> {
     pub(crate) fn new(target: &'a mut ArrDeque<T, N>, range: Range<usize>) -> Self {
         Self {
             target,
-            range,
-            drained_front: 0,
-            drained_back: 0,
+            range: range.clone(),
+            curr: range.clone(),
         }
     }
 }
 
 impl<T, const N: usize> Drop for Drain<'_, T, N> {
     fn drop(&mut self) {
-        self.target.clear_range(&self.range, true);
+        self.target.drop_elements(&self.curr);
+        self.target.clear_elements_without_drops(&self.range);
     }
 }
 
@@ -49,25 +46,21 @@ impl<T, const N: usize> Iterator for Drain<'_, T, N> {
 
     fn next(&mut self) -> Option<Self::Item> {
         (self.size_hint().1.unwrap() > 0).then_some(())?;
-        let index = self.range.start + self.drained_front;
-        let ret = unsafe { self.target.copy_val(index) };
-        self.drained_front += 1;
+        let ret = unsafe { self.target.copy_val(self.curr.start) };
+        self.curr.start += 1;
         Some(ret)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let drained = self.drained_front + self.drained_back;
-        let result = self.range.len() - drained;
-        (result, Some(result))
+        (self.curr.len(), Some(self.curr.len()))
     }
 }
 
 impl<T, const N: usize> DoubleEndedIterator for Drain<'_, T, N> {
     fn next_back(&mut self) -> Option<Self::Item> {
         (self.size_hint().1.unwrap() > 0).then_some(())?;
-        let index = self.range.end - self.drained_back - 1;
-        let ret = unsafe { self.target.copy_val(index) };
-        self.drained_back += 1;
+        let ret = unsafe { self.target.copy_val(self.curr.end - 1) };
+        self.curr.end -= 1;
         Some(ret)
     }
 }

@@ -600,7 +600,7 @@ fn remove() {
 
     fn when_impl_drop_for_item() {
         // Arrange.
-        let tracer = DropTracer::new();
+        let tracer = &DropTracer::new();
         let target = &mut ts::deque::empty_of();
         target.push_back(tracer.trace(ts::VAL));
         // Act.
