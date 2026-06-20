@@ -1,10 +1,10 @@
-use rand::distr::{Iter, StandardUniform};
+use rand::distr::StandardUniform;
 use rand::prelude::*;
-use rand_pcg::Pcg32;
 use std::fmt::Debug;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::iter;
 use std::ops::{Mul, Rem, Sub};
+use crate::for_test::*;
 
 pub fn dup<T>(x: T) -> (T, T)
 where
@@ -50,18 +50,11 @@ where
     iter
 }
 
-pub fn random_iter<T>() -> Iter<StandardUniform, Pcg32, T>
+pub fn random_vec<T>(n: usize) -> Vec<T>
 where
     StandardUniform: Distribution<T>,
 {
-    Pcg32::seed_from_u64(0).random_iter()
-}
-
-pub fn random_buf<T>(n: usize) -> Vec<T>
-where
-    StandardUniform: Distribution<T>,
-{
-    Vec::from_iter(random_iter().take(n))
+    Vec::from_iter(tu::RandIter::new().take(n))
 }
 
 pub fn hash<T: Hash>(target: &T) -> u64 {

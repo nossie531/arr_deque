@@ -33,7 +33,7 @@ impl<const N: usize> DequeBuilder<N> {
     {
         let mut ret = ArrDeque::new();
         ret.adjust_ring_start(self.ring_start);
-        ret.extend(tu::random_iter::<T>().take(self.len));
+        ret.extend(tu::RandIter::new().take(self.len));
         ret
     }
 }

@@ -1059,7 +1059,7 @@ fn extend() {
         let target = &mut ts::deque::normal();
         let master = &mut ch::vec_deque(&target);
         let len = (target.capacity() - target.len()) / 2;
-        let items = tu::random_iter::<i32>().take(len).collect::<Vec<_>>();
+        let items = tu::random_vec::<i32>(len);
         // Act.
         target.extend(items.clone());
         master.extend(items.clone());
@@ -1072,7 +1072,7 @@ fn extend() {
         let target = &mut ts::deque::normal();
         let master = &mut ch::vec_deque(&target);
         let len = (target.capacity() - target.len()) / 2;
-        let items = tu::random_iter::<i32>().take(len).collect::<Vec<_>>();
+        let items = tu::random_vec::<i32>(len);
         // Act.
         target.extend(items.iter());
         master.extend(items.iter());
@@ -1084,7 +1084,7 @@ fn extend() {
         // Arrange.
         let target = &mut ts::deque::normal();
         let len = target.capacity() - target.len() + 1;
-        let items = tu::random_iter::<i32>().take(len).collect::<Vec<_>>();
+        let items = tu::random_vec::<i32>(len);
         // Act.
         let result = test_panic(|| target.extend(items));
         // Assert.
@@ -1095,7 +1095,7 @@ fn extend() {
         // Arrange.
         let target = &mut ts::deque::normal();
         let len = target.capacity() - target.len() + 1;
-        let items = tu::random_iter::<i32>().take(len).collect::<Vec<_>>();
+        let items = tu::random_vec::<i32>(len);
         // Act.
         let result = test_panic(|| target.extend(items.iter()));
         // Assert.
@@ -1114,7 +1114,7 @@ fn from() {
     fn when_from_arr_normal() {
         // Arrange.
         const LEN: usize = ts::CAPACITY / 2;
-        let vec = Vec::<i32>::from_iter(tu::random_iter().take(LEN));
+        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(LEN));
         let arr = <[_; LEN]>::try_from(vec).unwrap();
         // Act.
         let result = ts::SampleDeque::from(arr.clone());
@@ -1125,7 +1125,7 @@ fn from() {
     fn when_from_vec_normal() {
         // Arrange.
         let len = ts::CAPACITY / 2;
-        let vec = Vec::<i32>::from_iter(tu::random_iter().take(len));
+        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(len));
         // Act.
         let result = ts::SampleDeque::from(vec.clone());
         // Assert.
@@ -1135,7 +1135,7 @@ fn from() {
     fn when_from_arr_capacity_over() {
         // Arrange.
         const LEN: usize = ts::CAPACITY + 1;
-        let vec = Vec::<i32>::from_iter(tu::random_iter().take(LEN));
+        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(LEN));
         let arr = <[_; LEN]>::try_from(vec).unwrap();
         // Act.
         let result = test_panic(|| ts::SampleDeque::from(arr.clone()));
@@ -1146,7 +1146,7 @@ fn from() {
     fn when_from_vec_capacity_over() {
         // Arrange.
         let len = ts::CAPACITY + 1;
-        let vec = Vec::<i32>::from_iter(tu::random_iter().take(len));
+        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(len));
         // Act.
         let result = test_panic(|| ts::SampleDeque::from(vec.clone()));
         // Assert.
@@ -1171,7 +1171,7 @@ fn from_iter() {
     fn when_normal() {
         // Arrange.
         let len = ts::CAPACITY / 2;
-        let items = tu::random_iter().take(len).collect::<Vec<_>>();
+        let items = tu::random_vec(len);
         // Act.
         let result = ts::SampleDeque::from_iter(items.clone());
         // Assert.
@@ -1181,7 +1181,7 @@ fn from_iter() {
     fn when_capacity_over() {
         // Arrange.
         let len = ts::CAPACITY + 1;
-        let items = tu::random_iter().take(len).collect::<Vec<_>>();
+        let items = tu::random_vec(len);
         // Act.
         let result = test_panic(|| {
             ts::SampleDeque::from_iter(items.clone());
@@ -1428,7 +1428,7 @@ fn write() {
         for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
             // Arrange.
             let master = &mut ch::vec_deque(&target);
-            let buf = &tu::random_buf(buf_len);
+            let buf = &tu::random_vec(buf_len);
             // Act.
             let asis = test_panic(|| target.write(buf));
             let tobe = test_panic(|| master.write(buf));
@@ -1445,7 +1445,7 @@ fn write() {
         for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
             // Arrange.
             let memo = target.clone();
-            let buf = &tu::random_buf(buf_len);
+            let buf = &tu::random_vec(buf_len);
             // Act.
             let result = test_panic(|| target.write(buf));
             // Assert.
