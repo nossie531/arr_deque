@@ -9,9 +9,9 @@ use test_panic::prelude::*;
 
 #[test]
 fn new() {
-    let result = ArrDeque::<i32, 5>::new();
+    let result = ts::SampleDeque::new();
     assert_eq!(result.len(), 0);
-    assert_eq!(result.capacity(), 5);
+    assert_eq!(result.capacity(), ts::CAPACITY);
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn contains() {
 
 #[test]
 fn capacity() {
-    let target = ArrDeque::<i32, { ts::CAPACITY }>::new();
+    let target = ts::deque::normal();
     let result = target.capacity();
     assert_eq!(result, ts::CAPACITY);
 }
@@ -242,7 +242,7 @@ fn partition_point() {
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
         let master = &ch::vec_deque(&target);
-        let pred = |x: &i32| *x < key;
+        let pred = |x: &ts::Val| *x < key;
         // Act.
         let asis = target.partition_point(pred);
         let tobe = master.partition_point(pred);
@@ -278,7 +278,7 @@ fn binary_search_by() {
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
         let master = &ch::vec_deque(&target);
-        let finder = |x: &i32| x.cmp(&key);
+        let finder = |x: &ts::Val| x.cmp(&key);
 
         // Act.
         let asis = target.binary_search_by(finder);
@@ -299,7 +299,7 @@ fn binary_search_by_key() {
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
         let master = &ch::vec_deque(&target);
-        let get_key = |x: &i32| *x;
+        let get_key = |x: &ts::Val| *x;
 
         // Act.
         let asis = target.binary_search_by_key(&key, get_key);
@@ -953,7 +953,7 @@ fn make_contiguous() {
         assert!(result.iter().eq(old.iter()));
 
         // Assert result and target are the same about mutability.
-        let edit = |x: i32| x.wrapping_add(1);
+        let edit = |x: ts::Val| x.wrapping_add(1);
         result.iter_mut().for_each(|x| *x = edit(*x));
         assert!(target.iter().cloned().eq(old.iter().map(|x| edit(*x))));
 
@@ -1012,9 +1012,9 @@ fn fmt() {
 
 #[test]
 fn default() {
-    let result = ArrDeque::<i32, 5>::default();
+    let result = ts::SampleDeque::default();
     assert_eq!(result.len(), 0);
-    assert_eq!(result.capacity(), 5);
+    assert_eq!(result.capacity(), ts::CAPACITY);
 }
 
 #[test]
@@ -1059,10 +1059,10 @@ fn extend() {
         let target = &mut ts::deque::normal();
         let master = &mut ch::vec_deque(&target);
         let len = (target.capacity() - target.len()) / 2;
-        let items = tu::random_vec::<i32>(len);
+        let vec = tu::random_vec::<ts::Val>(len);
         // Act.
-        target.extend(items.clone());
-        master.extend(items.clone());
+        target.extend(vec.clone());
+        master.extend(vec.clone());
         // Assert.
         assert!(target.iter().eq(master.iter()));
     }
@@ -1072,10 +1072,10 @@ fn extend() {
         let target = &mut ts::deque::normal();
         let master = &mut ch::vec_deque(&target);
         let len = (target.capacity() - target.len()) / 2;
-        let items = tu::random_vec::<i32>(len);
+        let vec = tu::random_vec::<ts::Val>(len);
         // Act.
-        target.extend(items.iter());
-        master.extend(items.iter());
+        target.extend(vec.iter());
+        master.extend(vec.iter());
         // Assert.
         assert!(target.iter().eq(master.iter()));
     }
@@ -1084,9 +1084,9 @@ fn extend() {
         // Arrange.
         let target = &mut ts::deque::normal();
         let len = target.capacity() - target.len() + 1;
-        let items = tu::random_vec::<i32>(len);
+        let vec = tu::random_vec::<ts::Val>(len);
         // Act.
-        let result = test_panic(|| target.extend(items));
+        let result = test_panic(|| target.extend(vec));
         // Assert.
         assert!(result.is_panic());
     }
@@ -1095,9 +1095,9 @@ fn extend() {
         // Arrange.
         let target = &mut ts::deque::normal();
         let len = target.capacity() - target.len() + 1;
-        let items = tu::random_vec::<i32>(len);
+        let vec = tu::random_vec::<ts::Val>(len);
         // Act.
-        let result = test_panic(|| target.extend(items.iter()));
+        let result = test_panic(|| target.extend(vec.iter()));
         // Assert.
         assert!(result.is_panic());
     }
@@ -1114,7 +1114,7 @@ fn from() {
     fn when_from_arr_normal() {
         // Arrange.
         const LEN: usize = ts::CAPACITY / 2;
-        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(LEN));
+        let vec = tu::random_vec(LEN);
         let arr = <[_; LEN]>::try_from(vec).unwrap();
         // Act.
         let result = ts::SampleDeque::from(arr.clone());
@@ -1125,7 +1125,7 @@ fn from() {
     fn when_from_vec_normal() {
         // Arrange.
         let len = ts::CAPACITY / 2;
-        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(len));
+        let vec = tu::random_vec(len);
         // Act.
         let result = ts::SampleDeque::from(vec.clone());
         // Assert.
@@ -1135,7 +1135,7 @@ fn from() {
     fn when_from_arr_capacity_over() {
         // Arrange.
         const LEN: usize = ts::CAPACITY + 1;
-        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(LEN));
+        let vec = tu::random_vec(LEN);
         let arr = <[_; LEN]>::try_from(vec).unwrap();
         // Act.
         let result = test_panic(|| ts::SampleDeque::from(arr.clone()));
@@ -1146,7 +1146,7 @@ fn from() {
     fn when_from_vec_capacity_over() {
         // Arrange.
         let len = ts::CAPACITY + 1;
-        let vec = Vec::<i32>::from_iter(tu::RandIter::new().take(len));
+        let vec = tu::random_vec(len);
         // Act.
         let result = test_panic(|| ts::SampleDeque::from(vec.clone()));
         // Assert.

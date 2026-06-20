@@ -46,7 +46,9 @@ where
     ts::ranges(deque.len()).map(move |r| (deque.clone(), r))
 }
 
-pub fn each_contains_keys(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::SampleDeque, i32)> {
+pub fn each_contains_keys(
+    deque: ts::SampleDeque,
+) -> impl Iterator<Item = (ts::SampleDeque, ts::Val)> {
     let keys_matched = ts::indicies_inside(deque.len())
         .map(|i| deque[i])
         .collect::<Vec<_>>();
@@ -64,7 +66,9 @@ pub fn each_contains_keys(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::S
     keys_all.map(move |k| (deque.clone(), k))
 }
 
-pub fn each_search_keys(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::SampleDeque, i32)> {
+pub fn each_search_keys(
+    deque: ts::SampleDeque,
+) -> impl Iterator<Item = (ts::SampleDeque, ts::Val)> {
     let keys_matched = ts::indicies_inside(deque.len())
         .map(|i| deque[i])
         .collect::<Vec<_>>();
@@ -88,12 +92,12 @@ pub fn each_search_keys(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::Sam
 
 pub fn each_predicates(
     deque: ts::SampleDeque,
-) -> impl Iterator<Item = (ts::SampleDeque, Box<dyn Fn(&i32) -> bool>)> {
+) -> impl Iterator<Item = (ts::SampleDeque, Box<dyn Fn(&ts::Val) -> bool>)> {
     ts::predicates().map(move |f| (deque.clone(), f))
 }
 
 pub fn each_predicates_mut(
     deque: ts::SampleDeque,
-) -> impl Iterator<Item = (ts::SampleDeque, Box<dyn Fn(&mut i32) -> bool>)> {
+) -> impl Iterator<Item = (ts::SampleDeque, Box<dyn Fn(&mut ts::Val) -> bool>)> {
     ts::predicates_mut().map(move |f| (deque.clone(), f))
 }

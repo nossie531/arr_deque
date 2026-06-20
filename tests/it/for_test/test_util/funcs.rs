@@ -1,10 +1,10 @@
+use crate::for_test::*;
 use rand::distr::StandardUniform;
 use rand::prelude::*;
 use std::fmt::Debug;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::iter;
 use std::ops::{Mul, Rem, Sub};
-use crate::for_test::*;
 
 pub fn dup<T>(x: T) -> (T, T)
 where

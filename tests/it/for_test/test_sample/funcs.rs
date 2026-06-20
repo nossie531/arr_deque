@@ -54,7 +54,7 @@ pub fn ranges_outside(len: usize) -> impl Iterator<Item = Range<usize>> {
     [broken_range, outbound_range].into_iter()
 }
 
-pub fn predicates() -> impl Iterator<Item = Box<dyn Fn(&i32) -> bool>> {
+pub fn predicates() -> impl Iterator<Item = Box<dyn Fn(&ts::Val) -> bool>> {
     {
         let arr: [Box<dyn Fn(&i32) -> bool>; _] = [
             Box::new(|_| true),
@@ -67,7 +67,7 @@ pub fn predicates() -> impl Iterator<Item = Box<dyn Fn(&i32) -> bool>> {
     .into_iter()
 }
 
-pub fn predicates_mut() -> impl Iterator<Item = Box<dyn Fn(&mut i32) -> bool>> {
+pub fn predicates_mut() -> impl Iterator<Item = Box<dyn Fn(&mut ts::Val) -> bool>> {
     {
         let arr: [Box<dyn Fn(&mut i32) -> bool>; _] = [
             Box::new(|_| true),

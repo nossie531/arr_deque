@@ -7,7 +7,7 @@ use std::ops::Range;
 #[derive(Clone, Default)]
 pub struct DrainBuilder {
     arr_deque: Option<ts::SampleDeque>,
-    vec_deque: Option<VecDeque<i32>>,
+    vec_deque: Option<VecDeque<ts::Val>>,
     range: Option<Range<usize>>,
     head_skip: usize,
     tail_skip: usize,
@@ -52,14 +52,14 @@ impl DrainBuilder {
         }
     }
 
-    pub fn build_target(&mut self) -> Drain<'_, i32, { ts::CAPACITY }> {
+    pub fn build_target(&mut self) -> Drain<'_, ts::Val, { ts::CAPACITY }> {
         let deque = self.arr_deque.as_mut().unwrap();
         let range = self.range.as_ref().unwrap().clone();
         let result = deque.drain(range.clone());
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
-    pub fn build_master(&mut self) -> Master<'_, i32> {
+    pub fn build_master(&mut self) -> Master<'_, ts::Val> {
         let deque = self.vec_deque.as_mut().unwrap();
         let range = self.range.as_ref().unwrap().clone();
         let result = deque.drain(range.clone());

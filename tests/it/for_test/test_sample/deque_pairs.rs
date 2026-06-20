@@ -38,8 +38,8 @@ pub fn all_for_cmp_normal() -> impl Iterator<Item = [ts::SampleDeque; 2]> {
             !x_has_nan && !y_has_nan
         })
         .map(|[x, y]| {
-            let x = ts::SampleDeque::from_iter(x.iter().map(|&x| x as i32));
-            let y = ts::SampleDeque::from_iter(y.iter().map(|&y| y as i32));
+            let x = ts::SampleDeque::from_iter(x.iter().map(|&x| x as ts::Val));
+            let y = ts::SampleDeque::from_iter(y.iter().map(|&y| y as ts::Val));
             [x, y]
         })
 }
