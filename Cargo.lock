@@ -28,9 +28,9 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
 name = "drop_tracer"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31cded6e39edf0041a2198d7d868175e7c9d49d325982236d4e7f24deaf1511a"
+checksum = "ceae6287d055d68e375ff979ce90ee8644e41bf250a8b0226ec355f2fbaf3434"
 dependencies = [
  "parking_lot",
 ]

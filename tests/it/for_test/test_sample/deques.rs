@@ -1,8 +1,18 @@
 use crate::for_test::*;
+use arr_deque::prelude::*;
+use rand::distr::StandardUniform;
+use rand::prelude::*;
 use subject::exts::UpgetExt;
 use subject::prelude::*;
 
 pub fn all() -> impl Iterator<Item = ts::SampleDeque> {
+    builders().into_iter().map(|x| x.build())
+}
+
+pub fn all_of<T>() -> impl Iterator<Item = ArrDeque<T, { ts::CAPACITY }>>
+where
+    StandardUniform: Distribution<T>,
+{
     builders().into_iter().map(|x| x.build())
 }
 
@@ -24,10 +34,6 @@ pub fn looses() -> impl Iterator<Item = ts::SampleDeque> {
 
 pub fn fulls() -> impl Iterator<Item = ts::SampleDeque> {
     all().filter(|x| x.len() == ts::CAPACITY)
-}
-
-pub fn type_bytes() -> impl Iterator<Item = ts::SampleDequeByte> {
-    builders().into_iter().map(|x| x.build())
 }
 
 fn builders() -> impl Iterator<Item = ts::SampleBuilder> {

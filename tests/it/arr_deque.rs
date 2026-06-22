@@ -1399,7 +1399,7 @@ fn read() {
     // This is because the amount of data read by `VecDeque::read` depends
     // on the buffer split position, which allows for some flexibility.
     // As a result, comparing the results becomes unreliable.
-    let targets = ts::deques::type_bytes();
+    let targets = ts::deques::all_of();
     let patterns = ts::deque_vs::each_indicies;
     for (ref mut target, buf_len) in targets.flat_map(patterns) {
         // Arrange.
@@ -1422,7 +1422,7 @@ fn write() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::type_bytes();
+        let targets = ts::deques::all_of();
         let patterns = ts::deque_vs::each_indicies;
         let cond = |x: &(ArrDeque<u8, 30>, usize)| x.0.len() + x.1 <= x.0.capacity();
         for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
@@ -1439,7 +1439,7 @@ fn write() {
     }
 
     fn when_capacity_over() {
-        let targets = ts::deques::type_bytes();
+        let targets = ts::deques::all_of();
         let patterns = ts::deque_vs::each_indicies;
         let cond = |x: &(ArrDeque<u8, 30>, usize)| x.0.len() + x.1 > x.0.capacity();
         for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
@@ -1468,7 +1468,7 @@ fn fill_buf() {
     // This is because the amount of data read by `VecDeque::read` depends
     // on the buffer split position, which allows for some flexibility.
     // As a result, comparing the results becomes unreliable.
-    for ref mut target in ts::deques::type_bytes() {
+    for ref mut target in ts::deques::all_of() {
         // Arrange.
         let to_read = Vec::from_iter(target.as_slices().0.iter().cloned());
         // Act.
@@ -1481,7 +1481,7 @@ fn fill_buf() {
 
 #[test]
 fn consume() {
-    let targets = ts::deques::type_bytes();
+    let targets = ts::deques::all_of();
     let patterns = ts::deque_vs::each_indicies_more;
     for (ref mut target, amt) in targets.flat_map(patterns) {
         // Arrange.

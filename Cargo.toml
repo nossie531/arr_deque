@@ -17,7 +17,7 @@ subject = "0.1"
 rand = "0.9"
 rand_pcg = "0.9"
 test_panic = "0.8"
-drop_tracer = "0.5"
+drop_tracer = "0.6"
 
 [features]
 default = ["std"]

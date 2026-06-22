@@ -1,6 +1,6 @@
 use crate::for_test::*;
-use arr_deque::ArrDeque;
 use drop_tracer::DropTracer;
+use std::mem;
 
 #[test]
 fn fmt() {
@@ -58,15 +58,23 @@ fn size_hint() {
 
 #[test]
 fn drop() {
-    // Arrange.
-    let deque = &mut ArrDeque::<_, { ts::CAPACITY }>::new();
-    let tracer = &DropTracer::new();
-    deque.extend((0..ts::NORMAL_LEN).map(|_| tracer.trace(ts::VAL)));
-    let mut target = deque.drain(..);
-    target.next();
-    target.next_back();
-    // Act.
-    std::mem::drop(target);
-    // Assert.
-    assert_eq!(tracer.living_count(), 0);
+    for ref mut builder in ts::drains::all_of::<ts::MyTraceVal>() {
+        // Arrange drop tracer.
+        let tracer = DropTracer::new();
+        for item in builder.deque_mut().iter_mut() {
+            tracer.trace_on(item.base_mut());
+        }
+
+        // Arrange target.
+        let numof_remains = builder.deque().len() - builder.range().len();
+        let mut target = builder.build_target();
+        target.next();
+        target.next_back();
+
+        // Act.
+        mem::drop(target);
+
+        // Assert.
+        assert_eq!(tracer.living_count(), numof_remains);
+    }
 }
