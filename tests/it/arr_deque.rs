@@ -4,6 +4,7 @@ use drop_tracer::prelude::*;
 use std::io::{BufRead, Read, Write};
 use std::ops::{Index, IndexMut};
 use std::{iter, mem};
+use std::rc::Rc;
 use test_panic::TestPanicResult;
 use test_panic::prelude::*;
 
@@ -997,9 +998,25 @@ fn adjust_ring_start() {
 
 #[test]
 fn clone() {
-    for target in ts::deques::all() {
-        let result = target.clone();
-        assert_eq!(result, target);
+    when_normal();
+    when_cannot_bitcopy();
+
+    fn when_normal() {
+        for target in ts::deques::all() {
+            let result = target.clone();
+            assert_eq!(result, target);
+        }
+    }
+
+    fn when_cannot_bitcopy() {
+        // Arrange.
+        let target = &mut ts::deque::empty_of();
+        let value = Rc::new(ts::VAL);
+        target.push_back(value.clone());
+        // Act.
+        let _result = target.clone();
+        // Assert.
+        assert_eq!(Rc::strong_count(&value), 3);
     }
 }
 

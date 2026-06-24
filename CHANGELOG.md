@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `ArrDeque::clone` (Bit copy not clone)
 - `Drain::drop` (Double free) 
 
 ## [0.2.0] - 2026-06-18

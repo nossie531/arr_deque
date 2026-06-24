@@ -1675,11 +1675,15 @@ where
         let mut ret = Self::new();
         ret.start = self.start;
         ret.len = self.len;
-        unsafe {
-            let (dst1, dst2) = ret.as_mut_slices();
-            let (src1, src2) = self.as_slices();
-            ptr::copy_nonoverlapping(src1.as_ptr(), dst1.as_mut_ptr(), dst1.len());
-            ptr::copy_nonoverlapping(src2.as_ptr(), dst2.as_mut_ptr(), dst2.len());
+
+        for range in self.to_buf_ranges(&(0..self.len)) {
+            for index in range {
+                unsafe {
+                    let value = self.copy_buf_val(index);
+                    ret.write_buf_val(index, value.clone());
+                    mem::forget(value);
+                }
+            }
         }
 
         ret
