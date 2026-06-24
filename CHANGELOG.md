@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - YYYY-MM-DD
 
-No items.
+### Changed
+
+- Polish documentations.
 
 ## [0.3.0] - 2026-06-24
 
@@ -24,20 +26,20 @@ No items.
 
 ## [0.1.2] - 2026-06-02
 
-- Polish documentation
+- Polish documentations.
 
 ## [0.1.1] - 2026-06-02
 
-- Polish documentation
+- Polish documentations.
 
 ## [0.1.0] - 2026-06-01
 
 ### Added
 
-- Initial release
+- Initial release.
 
 [Unreleased]: https://github.com/nossie531/arr_deque/compare/v0.3.0...HEAD
-[0.2.0]: https://github.com/nossie531/arr_deque/compare/v0.2.0...v0.3.0
+[0.3.0]: https://github.com/nossie531/arr_deque/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nossie531/arr_deque/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/nossie531/arr_deque/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/nossie531/arr_deque/compare/v0.1.0...v0.1.1
