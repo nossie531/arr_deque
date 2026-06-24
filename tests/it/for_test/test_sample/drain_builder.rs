@@ -1,5 +1,6 @@
 use crate::for_test::*;
 use arr_deque::*;
+use drop_tracer::DropTracer;
 use std::collections::VecDeque;
 use std::collections::vec_deque::Drain as Master;
 use std::ops::Range;
@@ -13,10 +14,7 @@ pub struct DrainBuilder<T> {
     tail_skip: usize,
 }
 
-impl<T> DrainBuilder<T>
-where
-    T: Clone,
-{
+impl<T> DrainBuilder<T> {
     pub fn new() -> Self {
         Self {
             arr_deque: None,
@@ -31,15 +29,14 @@ where
         self.arr_deque.as_ref().unwrap()
     }
 
-    pub fn deque_mut(&mut self) -> &mut ArrDeque<T, { ts::CAPACITY }> {
-        self.arr_deque.as_mut().unwrap()
-    }
-
     pub fn range(&self) -> &Range<usize> {
         self.range.as_ref().unwrap()
     }
 
-    pub fn with_deque(self, value: ArrDeque<T, { ts::CAPACITY }>) -> Self {
+    pub fn with_deque(self, value: ArrDeque<T, { ts::CAPACITY }>) -> Self
+    where
+        T: Clone,
+    {
         let vec_deque = VecDeque::from_iter(value.iter().cloned());
         Self {
             arr_deque: Some(value),
@@ -84,10 +81,23 @@ where
     }
 }
 
-impl<T> Default for DrainBuilder<T>
-where
-    T: Clone,
-{
+impl DrainBuilder<ts::TraceValNt> {
+    pub fn build_traced_target(
+        &mut self,
+        tracer: &DropTracer,
+    ) -> Drain<'_, ts::TraceValNt, { ts::CAPACITY }> {
+        let deque = self.arr_deque.as_mut().unwrap();
+        for item in deque.iter_mut() {
+            tracer.trace_on(item.base_mut());
+        }
+
+        let range = self.range.as_ref().unwrap().clone();
+        let result = deque.drain(range.clone());
+        tu::skip_iter(result, self.head_skip, self.tail_skip)
+    }
+}
+
+impl<T> Default for DrainBuilder<T> {
     fn default() -> Self {
         Self::new()
     }

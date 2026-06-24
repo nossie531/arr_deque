@@ -58,22 +58,15 @@ fn size_hint() {
 
 #[test]
 fn drop() {
-    for ref mut builder in ts::drains::all_of::<ts::MyTraceVal>() {
-        // Arrange drop tracer.
+    for ref mut builder in ts::drains::all_of::<ts::TraceValNt>() {
+        // Arrange.
         let tracer = DropTracer::new();
-        for item in builder.deque_mut().iter_mut() {
-            tracer.trace_on(item.base_mut());
-        }
-
-        // Arrange target.
         let numof_remains = builder.deque().len() - builder.range().len();
-        let mut target = builder.build_target();
+        let mut target = builder.build_traced_target(&tracer);
         target.next();
         target.next_back();
-
         // Act.
         mem::drop(target);
-
         // Assert.
         assert_eq!(tracer.living_count(), numof_remains);
     }

@@ -78,6 +78,6 @@ pub fn all_for_cmp_float() -> impl Iterator<Item = [ts::SampleDequeFloat; 2]> {
 }
 
 fn pair_for_cmp_float() -> [ts::SampleDequeFloat; 2] {
-    let single = ts::deque::type_float();
+    let single = ts::deque::normal_float();
     [single.clone(), single.clone()]
 }

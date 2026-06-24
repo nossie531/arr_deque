@@ -8,7 +8,7 @@ pub(crate) use deque_builder::*;
 pub(crate) use drain_builder::*;
 pub(crate) use funcs::*;
 pub(crate) use iter_builder::*;
-pub(crate) use my_trace_val::*;
+pub(crate) use trace_val_nt::*;
 
 pub const VAL: Val = 42;
 pub const QUANT_SIZE: Val = 10;
@@ -28,5 +28,5 @@ mod deque_builder;
 mod drain_builder;
 mod funcs;
 mod iter_builder;
-mod my_trace_val;
+mod trace_val_nt;
 use arr_deque::prelude::*;

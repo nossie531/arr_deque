@@ -2,8 +2,8 @@ use crate::for_test::*;
 use arr_deque::prelude::*;
 use drop_tracer::prelude::*;
 use std::io::{BufRead, Read, Write};
+use std::mem;
 use std::ops::{Index, IndexMut};
-use std::{iter, mem};
 use std::rc::Rc;
 use test_panic::TestPanicResult;
 use test_panic::prelude::*;
@@ -328,8 +328,8 @@ fn clear() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_back(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of();
+        target.push_back(ts::TraceValNt::new(ts::VAL, tracer));
         // Act.
         target.clear();
         // Assert.
@@ -358,8 +358,8 @@ fn pop_front() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_front(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of();
+        target.push_front(ts::TraceValNt::new(ts::VAL, tracer));
         // Act.
         let result = target.pop_front();
         // Assert.
@@ -390,8 +390,8 @@ fn pop_back() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_back(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of();
+        target.push_back(ts::TraceValNt::new(ts::VAL, tracer));
         // Act.
         let result = target.pop_back();
         // Assert.
@@ -424,8 +424,8 @@ fn pop_front_if() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_front(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of();
+        target.push_front(ts::TraceValNt::new(ts::VAL, tracer));
         // Act.
         let result = target.pop_front_if(|_| true);
         // Assert.
@@ -458,8 +458,8 @@ fn pop_back_if() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_back(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of();
+        target.push_back(ts::TraceValNt::new(ts::VAL, tracer));
         // Act.
         let result = target.pop_back_if(|_| true);
         // Assert.
@@ -602,10 +602,11 @@ fn remove() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_back(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of::<ts::TraceValNt>();
+        let index = target.len() / 2;
+        tracer.trace_on(target.get_mut(index).unwrap().base_mut());
         // Act.
-        let result = target.remove(0);
+        let result = target.remove(index);
         // Assert.
         assert_eq!(tracer.living_count(), 1);
         mem::drop(result);
@@ -682,11 +683,12 @@ fn swap_remove_front() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_back(tracer.trace(ts::VAL));
-        target.push_back(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of::<ts::TraceValNt>();
+        let index = target.len() / 2;
+        tracer.trace_on(target.get_mut(0).unwrap().base_mut());
+        tracer.trace_on(target.get_mut(index).unwrap().base_mut());
         // Act.
-        let result = target.swap_remove_front(1);
+        let result = target.swap_remove_front(index);
         // Assert.
         assert_eq!(tracer.living_count(), 2);
         mem::drop(result);
@@ -717,11 +719,12 @@ fn swap_remove_back() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.push_back(tracer.trace(ts::VAL));
-        target.push_back(tracer.trace(ts::VAL));
+        let target = &mut ts::deque::normal_of::<ts::TraceValNt>();
+        let index = target.len() / 2;
+        tracer.trace_on(target.get_mut(0).unwrap().base_mut());
+        tracer.trace_on(target.get_mut(index).unwrap().base_mut());
         // Act.
-        let result = target.swap_remove_back(0);
+        let result = target.swap_remove_back(index);
         // Assert.
         assert_eq!(tracer.living_count(), 2);
         mem::drop(result);
@@ -783,8 +786,7 @@ fn truncate() {
     fn when_impl_drop_for_item() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::empty_of();
-        target.extend(iter::repeat_with(|| tracer.trace(ts::VAL)).take(ts::NORMAL_LEN));
+        let target = &mut ts::deque::normal_traced(tracer);
         // Act.
         target.truncate(ts::NORMAL_LEN / 2);
         // Assert.
@@ -1474,7 +1476,7 @@ fn write() {
 
 #[test]
 fn flush() {
-    let target = &mut ts::deque::type_byte();
+    let target = &mut ts::deque::normal_byte();
     let result = target.flush();
     assert!(result.is_ok());
 }
