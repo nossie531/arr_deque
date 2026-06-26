@@ -3,14 +3,19 @@ use rand::distr::StandardUniform;
 use rand::prelude::*;
 use std::fmt::Debug;
 use std::hash::{DefaultHasher, Hash, Hasher};
-use std::iter;
 use std::ops::{Mul, Rem, Sub};
+use std::{array, iter};
 
 pub fn dup<T>(x: T) -> (T, T)
 where
     T: Clone,
 {
     (x.clone(), x)
+}
+
+pub fn to_array<T, const N: usize>(iter: impl IntoIterator<Item = T>) -> [T; N] {
+    let mut iter = iter.into_iter();
+    array::from_fn(|_| iter.next().unwrap())
 }
 
 pub fn step_index(i: usize, len: usize, sep: usize) -> usize {

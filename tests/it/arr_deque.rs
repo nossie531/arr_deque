@@ -39,7 +39,7 @@ fn contains() {
     let patterns = ts::deque_vs::each_contains_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
         // Act.
         let asis = target.contains(&key);
         let tobe = master.contains(&key);
@@ -58,7 +58,7 @@ fn capacity() {
 #[test]
 fn len() {
     let target = ts::deque::normal();
-    let master = ch::vec_deque(&target);
+    let master = ch::master(&target);
     let asis = target.len();
     let tobe = master.len();
     assert_eq!(asis, tobe);
@@ -68,7 +68,7 @@ fn len() {
 fn front() {
     for ref target in ts::deques::all() {
         // Arrange.
-        let master = &ch::vec_deque(target);
+        let master = &ch::master(target);
         // Act.
         let asis = target.front();
         let tobe = master.front();
@@ -81,7 +81,7 @@ fn front() {
 fn front_mut() {
     for ref mut target in ts::deques::all() {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
         // Act.
         let asis = target.front_mut();
         let tobe = master.front_mut();
@@ -97,7 +97,7 @@ fn front_mut() {
 fn back() {
     for ref target in ts::deques::all() {
         // Arrange.
-        let master = &ch::vec_deque(target);
+        let master = &ch::master(target);
         // Act.
         let asis = target.back();
         let tobe = master.back();
@@ -110,7 +110,7 @@ fn back() {
 fn back_mut() {
     for ref mut target in ts::deques::all() {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
         // Act.
         let asis = target.back_mut();
         let tobe = master.back_mut();
@@ -128,7 +128,7 @@ fn get() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = ch::vec_deque(target);
+        let master = ch::master(target);
         // Act.
         let asis = target.get(index);
         let tobe = master.get(index);
@@ -143,7 +143,7 @@ fn get_mut() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         // Act.
         let asis = target.get_mut(index);
         let tobe = master.get_mut(index);
@@ -156,7 +156,7 @@ fn get_mut() {
 fn as_slices() {
     for ref mut target in ts::deques::all() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         // Act.
         let asis = target.as_slices();
         let tobe = master.as_slices();
@@ -171,7 +171,7 @@ fn as_slices() {
 fn as_mut_slices() {
     for ref mut target in ts::deques::all() {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         // Act.
         let asis = target.as_mut_slices();
         let tobe = master.as_mut_slices();
@@ -185,7 +185,7 @@ fn as_mut_slices() {
 #[test]
 fn iter() {
     for ref target in ts::deques::all() {
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
         let asis = target.iter();
         let tobe = master.iter();
         assert!(asis.eq(tobe));
@@ -195,7 +195,7 @@ fn iter() {
 #[test]
 fn iter_mut() {
     for ref mut target in ts::deques::all() {
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         let asis = target.iter_mut();
         let tobe = master.iter_mut();
         assert!(asis.eq(tobe));
@@ -208,7 +208,7 @@ fn range() {
     let patterns = ts::deque_vs::each_ranges;
     for (ref target, range) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(target);
+        let master = &ch::master(target);
         // Act.
         let asis = test_panic(|| target.range(range.clone()));
         let tobe = test_panic(|| master.range(range.clone()));
@@ -224,7 +224,7 @@ fn range_mut() {
     let patterns = ts::deque_vs::each_ranges;
     for (ref mut target, range) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
 
         // Act.
         let asis = test_panic(|| target.range_mut(range.clone()));
@@ -242,7 +242,7 @@ fn partition_point() {
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
         let pred = |x: &ts::Val| *x < key;
         // Act.
         let asis = target.partition_point(pred);
@@ -258,7 +258,7 @@ fn binary_search() {
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
 
         // Act.
         let asis = target.binary_search(&key);
@@ -278,7 +278,7 @@ fn binary_search_by() {
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
         let finder = |x: &ts::Val| x.cmp(&key);
 
         // Act.
@@ -299,7 +299,7 @@ fn binary_search_by_key() {
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
         let get_key = |x: &ts::Val| *x;
 
         // Act.
@@ -345,7 +345,7 @@ fn pop_front() {
     fn when_normal() {
         for ref mut target in ts::deques::all() {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.pop_front();
             let tobe = master.pop_front();
@@ -377,7 +377,7 @@ fn pop_back() {
     fn when_normal() {
         for ref mut target in ts::deques::all() {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.pop_back();
             let tobe = master.pop_back();
@@ -411,7 +411,7 @@ fn pop_front_if() {
         let patterns = ts::deque_vs::each_predicates_mut;
         for (ref mut target, predicate) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.pop_front_if(|x| predicate(x));
             let tobe = master.pop_front_if(|x| predicate(x));
@@ -445,7 +445,7 @@ fn pop_back_if() {
         let patterns = ts::deque_vs::each_predicates_mut;
         for (ref mut target, predicate) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.pop_back_if(|x| predicate(x));
             let tobe = master.pop_back_if(|x| predicate(x));
@@ -477,7 +477,7 @@ fn push_front() {
     fn when_normal() {
         for ref mut target in ts::deques::looses() {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             let value = ts::VAL;
             // Act.
             let asis = target.push_front(value);
@@ -504,7 +504,7 @@ fn push_front_mut() {
     fn when_normal() {
         for ref mut target in ts::deques::looses() {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             let value = ts::VAL;
             // Act.
             let asis = target.push_front_mut(value);
@@ -533,7 +533,7 @@ fn push_back() {
     fn when_normal() {
         for ref mut target in ts::deques::looses() {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.push_back(ts::VAL);
             let tobe = master.push_back(ts::VAL);
@@ -559,7 +559,7 @@ fn push_back_mut() {
     fn when_normal() {
         for ref mut target in ts::deques::looses() {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.push_back_mut(ts::VAL);
             let tobe = master.push_back_mut(ts::VAL);
@@ -589,7 +589,7 @@ fn remove() {
         let patterns = ts::deque_vs::each_indicies;
         for (ref mut target, index) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = test_panic(|| target.remove(index));
             let tobe = test_panic(|| master.remove(index));
@@ -624,7 +624,7 @@ fn insert_xxx() {
         let patterns = ts::deque_vs::each_indicies;
         for (ref mut target, index) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = test_panic(|| target.insert_mut(index, ts::VAL));
             let tobe = test_panic(|| master.insert_mut(index, ts::VAL));
@@ -650,7 +650,7 @@ fn swap() {
     let patterns = ts::deque_vs::each_index_pairs;
     for (ref mut target, i, j) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         // Act.
         let asis = test_panic(|| target.swap(i, j));
         let tobe = test_panic(|| master.swap(i, j));
@@ -670,7 +670,7 @@ fn swap_remove_front() {
         let patterns = ts::deque_vs::each_indicies;
         for (ref mut target, index) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.swap_remove_front(index);
             let tobe = master.swap_remove_front(index);
@@ -706,7 +706,7 @@ fn swap_remove_back() {
         let patterns = ts::deque_vs::each_indicies;
         for (ref mut target, index) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             // Act.
             let asis = target.swap_remove_back(index);
             let tobe = master.swap_remove_back(index);
@@ -738,7 +738,7 @@ fn rotate_left() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
         // Act.
         let asis = test_panic(|| target.rotate_left(index));
         let tobe = test_panic(|| master.rotate_left(index));
@@ -754,7 +754,7 @@ fn rotate_right() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
         // Act.
         let asis = test_panic(|| target.rotate_right(index));
         let tobe = test_panic(|| master.rotate_right(index));
@@ -774,7 +774,7 @@ fn truncate() {
         let patterns = ts::deque_vs::each_indicies;
         for (ref mut target, index) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(target);
+            let master = &mut ch::master(target);
             // Act.
             target.truncate(index);
             master.truncate(index);
@@ -800,7 +800,7 @@ fn split_off() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
         // Act.
         let asis = test_panic(|| target.split_off(index));
         let tobe = test_panic(|| master.split_off(index));
@@ -820,8 +820,8 @@ fn append() {
         let args = ts::deque_pairs::all_for_append_normal();
         for [ref mut target, ref mut other] in args {
             // Arrange.
-            let master = &mut ch::vec_deque(target);
-            let master_other = &mut ch::vec_deque(other);
+            let master = &mut ch::master(target);
+            let master_other = &mut ch::master(other);
             // Act.
             target.append(other);
             master.append(master_other);
@@ -854,7 +854,7 @@ fn resize() {
         let patterns = ts::deque_vs::each_indicies_more;
         for (ref mut target, len) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(target);
+            let master = &mut ch::master(target);
             // Act.
             target.resize(len, ts::VAL);
             master.resize(len, ts::VAL);
@@ -881,7 +881,7 @@ fn resize_with() {
         let patterns = ts::deque_vs::each_indicies_more;
         for (ref mut target, len) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::vec_deque(target);
+            let master = &mut ch::master(target);
             // Act.
             target.resize_with(len, || ts::VAL);
             master.resize_with(len, || ts::VAL);
@@ -904,7 +904,7 @@ fn retain_xxx() {
     let patterns = ts::deque_vs::each_predicates;
     for (ref mut target, f) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
         // Act.
         target.retain(|x| f(x));
         master.retain(|x| f(x));
@@ -919,7 +919,7 @@ fn drain() {
     let patterns = ts::deque_vs::each_ranges;
     for (ref mut target, range) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(target);
+        let master = &mut ch::master(target);
 
         // Act.
         let asis = test_panic(|| target.drain(range.clone()));
@@ -1076,7 +1076,7 @@ fn extend() {
     fn when_vals_normal() {
         // Arrange.
         let target = &mut ts::deque::normal();
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         let len = (target.capacity() - target.len()) / 2;
         let vec = tu::random_vec::<ts::Val>(len);
         // Act.
@@ -1089,7 +1089,7 @@ fn extend() {
     fn when_refs_normal() {
         // Arrange.
         let target = &mut ts::deque::normal();
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         let len = (target.capacity() - target.len()) / 2;
         let vec = tu::random_vec::<ts::Val>(len);
         // Act.
@@ -1225,7 +1225,7 @@ fn index() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &ch::vec_deque(&target);
+        let master = &ch::master(&target);
         // Act.
         let asis = test_panic(|| Index::index(target, index));
         let tobe = test_panic(|| Index::index(master, index));
@@ -1240,7 +1240,7 @@ fn index_mut() {
     let patterns = ts::deque_vs::each_indicies;
     for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         // Act.
         let asis = test_panic(|| IndexMut::index_mut(target, index));
         let tobe = test_panic(|| IndexMut::index_mut(master, index));
@@ -1257,7 +1257,7 @@ fn into_iter() {
 
     fn when_val() {
         for target in ts::deques::all() {
-            let master = ch::vec_deque(&target);
+            let master = ch::master(&target);
             let asis = target.into_iter();
             let tobe = master.into_iter();
             assert!(asis.eq(tobe));
@@ -1266,7 +1266,7 @@ fn into_iter() {
 
     fn when_ref() {
         for ref target in ts::deques::all() {
-            let master = &ch::vec_deque(target);
+            let master = &ch::master(target);
             let asis = target.into_iter();
             let tobe = master.into_iter();
             assert!(asis.eq(tobe));
@@ -1275,7 +1275,7 @@ fn into_iter() {
 
     fn when_mut() {
         for ref mut target in ts::deques::all() {
-            let master = &mut ch::vec_deque(target);
+            let master = &mut ch::master(target);
             let asis = target.into_iter();
             let tobe = master.into_iter();
             assert!(asis.eq(tobe));
@@ -1285,13 +1285,11 @@ fn into_iter() {
 
 #[test]
 fn cmp() {
-    for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-        // Act.
-        let result = target.cmp(&other);
-        // Assert.
-        let target_iter = target.iter();
-        let other_iter = other.iter();
-        assert_eq!(result, target_iter.cmp(other_iter));
+    for [target1, target2] in ts::deque_pairs::all_for_cmp_normal() {
+        let [master1, master2] = [ch::master(&target1), ch::master(&target2)];
+        let asis = target1.cmp(&target2);
+        let tobe = master1.cmp(&master2);
+        assert_eq!(asis, tobe);
     }
 }
 
@@ -1306,96 +1304,65 @@ fn eq() {
     when_arr_mut();
 
     fn when_normal() {
-        for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Act.
-            let result = target.eq(&other);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+        for [target1, target2] in ts::deque_pairs::all_for_cmp_normal() {
+            let [master1, master2] = [ch::master(&target1), ch::master(&target2)];
+            let asis = target1.eq(&target2);
+            let tobe = master1.eq(&master2);
+            assert_eq!(asis, tobe);
         }
     }
 
     fn when_vec() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Arrange.
-            let other_vec = other.iter().cloned().collect::<Vec<_>>();
-            // Act.
-            let result = target.eq(&other_vec);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other_vec.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+            let master = ch::master(&target);
+            let asis = target.eq(&Vec::from_iter(other.iter().cloned()));
+            let tobe = master.eq(&Vec::from_iter(other.iter().cloned()));
+            assert_eq!(asis, tobe);
         }
     }
 
     fn when_slice_ref() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Arrange.
-            let other_vec = other.iter().cloned().collect::<Vec<_>>();
-            let other_slice = other_vec.as_slice();
-            // Act.
-            let result = target.eq(&other_slice);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other_slice.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+            let master = ch::master(&target);
+            let asis = target.eq(&Vec::from_iter(other.iter().cloned()).as_slice());
+            let tobe = master.eq(&Vec::from_iter(other.iter().cloned()).as_slice());
+            assert_eq!(asis, tobe);
         }
     }
 
     fn when_slice_mut() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Arrange.
-            let other_vec = &mut other.iter().cloned().collect::<Vec<_>>();
-            let other_slice = other_vec.as_mut_slice();
-            // Act.
-            let result = target.eq(&other_slice);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other_slice.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+            let master = ch::master(&target);
+            let asis = target.eq(&Vec::from_iter(other.iter().cloned()).as_mut_slice());
+            let tobe = master.eq(&Vec::from_iter(other.iter().cloned()).as_mut_slice());
+            assert_eq!(asis, tobe);
         }
     }
 
     fn when_arr() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Arrange.
-            let other_vec = other.iter().cloned().collect::<Vec<_>>();
-            let other_arr = <[_; ts::NORMAL_LEN]>::try_from(other_vec).unwrap();
-            // Act.
-            let result = target.eq(&other_arr);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other_arr.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+            let master = ch::master(&target);
+            let asis = target.eq(&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            assert_eq!(asis, tobe);
         }
     }
 
     fn when_arr_ref() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Arrange.
-            let other_vec = other.iter().cloned().collect::<Vec<_>>();
-            let other_arr = &<[_; ts::NORMAL_LEN]>::try_from(other_vec).unwrap();
-            // Act.
-            let result = target.eq(&other_arr);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other_arr.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+            let master = ch::master(&target);
+            let asis = target.eq(&&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            assert_eq!(asis, tobe);
         }
     }
 
     fn when_arr_mut() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
-            // Arrange.
-            let other_vec = other.iter().cloned().collect::<Vec<_>>();
-            let other_arr = &mut <[_; ts::NORMAL_LEN]>::try_from(other_vec).unwrap();
-            // Act.
-            let result = target.eq(&other_arr);
-            // Assert.
-            let target_iter = target.iter();
-            let other_iter = other_arr.iter();
-            assert_eq!(result, target_iter.eq(other_iter));
+            let master = ch::master(&target);
+            let asis = target.eq(&&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            assert_eq!(asis, tobe);
         }
     }
 }
@@ -1446,7 +1413,7 @@ fn write() {
         let cond = |x: &(ArrDeque<u8, 30>, usize)| x.0.len() + x.1 <= x.0.capacity();
         for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
             // Arrange.
-            let master = &mut ch::vec_deque(&target);
+            let master = &mut ch::master(&target);
             let buf = &tu::random_vec(buf_len);
             // Act.
             let asis = test_panic(|| target.write(buf));
@@ -1504,7 +1471,7 @@ fn consume() {
     let patterns = ts::deque_vs::each_indicies_more;
     for (ref mut target, amt) in targets.flat_map(patterns) {
         // Arrange.
-        let master = &mut ch::vec_deque(&target);
+        let master = &mut ch::master(&target);
         // Act.
         let asis = test_panic(|| target.consume(amt));
         let tobe = test_panic(|| master.consume(amt));

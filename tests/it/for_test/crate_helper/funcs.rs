@@ -2,7 +2,7 @@ use crate::for_test::crate_helper::*;
 use arr_deque::prelude::*;
 use std::collections::VecDeque;
 
-pub fn vec_deque<T, const N: usize>(target: &ArrDeque<T, N>) -> VecDeque<T>
+pub fn master<T, const N: usize>(target: &ArrDeque<T, N>) -> VecDeque<T>
 where
     T: Clone,
 {
