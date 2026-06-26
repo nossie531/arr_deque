@@ -10,9 +10,11 @@ use core::mem;
 use core::mem::MaybeUninit;
 use core::ops::{Index, IndexMut, Not, Range, RangeBounds};
 use core::ptr;
-use std::io::{self, BufRead, Read, Write};
 use subject::exts::{MapExt, UpgetExt};
 use subject::prelude::*;
+
+#[cfg(feature = "std")]
+use std::io::{self, BufRead, Read, Write};
 
 #[cfg(feature = "alloc")]
 use std::vec::Vec;
@@ -1913,6 +1915,7 @@ impl<T, const N: usize> From<ArrDeque<T, N>> for Vec<T> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<const N: usize> BufRead for ArrDeque<u8, N> {
     #[inline]
     fn fill_buf(&mut self) -> io::Result<&[u8]> {
@@ -1927,11 +1930,12 @@ impl<const N: usize> BufRead for ArrDeque<u8, N> {
     }
 }
 
+#[cfg(feature = "std")]
 impl<const N: usize> Read for ArrDeque<u8, N> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        let (ref mut slice_this_time, _) = self.as_slices();
-        let count = Read::read(slice_this_time, buf)?;
+        let (ref mut this_time_src, _) = self.as_slices();
+        let count = this_time_src.read(buf).unwrap();
         self.clear_elements_without_drops(&..count);
         Ok(count)
     }
@@ -1940,6 +1944,7 @@ impl<const N: usize> Read for ArrDeque<u8, N> {
 /// # Notes
 ///
 /// Some methods panic if the number of elements exceeds the capacity.
+#[cfg(feature = "std")]
 impl<const N: usize> Write for ArrDeque<u8, N> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {

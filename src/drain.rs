@@ -1,8 +1,8 @@
 //! Provider of [`Drain`].
 
 use crate::*;
+use core::iter::FusedIterator;
 use core::ops::Range;
-use std::iter::FusedIterator;
 
 /// A draining iterator over the elements of an `ArrDeque`.
 ///
