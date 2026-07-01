@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - YYYY-MM-DD
 
-No items.
+### Changed
+
+- Polish documentations.
 
 ## [0.4.0] - 2026-06-27
 

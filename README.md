@@ -20,7 +20,7 @@ Followings are some of them.
 📦 [`arraydeque`](https://crates.io/crates/arraydeque)\
 📦 [`array-deque`](https://crates.io/crates/array-deque)
 
-I recommend these over my crate if there is special reason.
+I recommend these crates over my crate if there are no special reasons.
 
 ## Highlights
 
