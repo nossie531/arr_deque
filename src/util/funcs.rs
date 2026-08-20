@@ -47,6 +47,12 @@ pub(crate) fn range_prod(rx: &Range<usize>, ry: &Range<usize>) -> Range<usize> {
     (rw::refr(rx) & rw::refr(ry)).0
 }
 
+/// Returns the difference of two ranges.
+pub(crate) fn range_diff(rx: &Range<usize>, ry: &Range<usize>) -> [Range<usize>; 2] {
+    let ranges = rw::refr(rx).diff(rw::refr(ry));
+    <[_; _]>::from(ranges).map(|opt| opt.map_or(0..0, |r| r.try_into().unwrap()))
+}
+
 /// Returns capped range.
 pub(crate) fn range_cap<R>(range: &R, bounds: &RangeTo<usize>) -> Range<usize>
 where
@@ -55,12 +61,6 @@ where
     let rx = rv::new(range).to_univ();
     let ry = rv::new(bounds).to_univ();
     (rx & ry).to_range()
-}
-
-/// Returns the difference of two ranges.
-pub(crate) fn range_diff(rx: &Range<usize>, ry: &Range<usize>) -> [Range<usize>; 2] {
-    let ranges = rw::refr(rx).diff(rw::refr(ry));
-    <[_; _]>::from(ranges).map(|opt| opt.map_or(0..0, |r| r.try_into().unwrap()))
 }
 
 /// Returns rotated array.
