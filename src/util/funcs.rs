@@ -54,13 +54,39 @@ pub(crate) fn range_diff(rx: &Range<usize>, ry: &Range<usize>) -> [Range<usize>;
 }
 
 /// Returns capped range.
-pub(crate) fn range_cap<R>(range: &R, bounds: &RangeTo<usize>) -> Range<usize>
+pub(crate) fn range_cap<R>(range: &R, len: usize) -> Range<usize>
 where
     R: RangeBounds<usize>,
 {
-    let rx = rv::new(range).to_univ();
-    let ry = rv::new(bounds).to_univ();
-    (rx & ry).to_range()
+    let range = range_cap_raw(range, len);
+    range.start.min(range.end)..range.end
+}
+
+/// Performs bounds checking of a range.
+///
+/// # Notes
+///
+/// This function is substitute for nightly-only [`range`](std::slice::range).
+///
+/// # Panics
+///
+/// Panics in the following cases.
+///
+/// - Range start and end is reverse order
+/// - Range end is greater than bounds end
+#[track_caller]
+pub(crate) fn range_slice<R>(range: R, bounds: RangeTo<usize>) -> Range<usize>
+where
+    R: RangeBounds<usize>,
+{
+    let range = range_cap_raw(&range, bounds.end);
+    if range.start > range.end {
+        panic!(msg::range_order_rev!(), range.start, range.end);
+    } else if range.end > bounds.end {
+        panic!(msg::range_end_gt_bounds_end!(), range.end, bounds.end);
+    } else {
+        range
+    }
 }
 
 /// Returns rotated array.
@@ -110,20 +136,8 @@ where
     None
 }
 
-/// Performs bounds checking of a range.
-///
-/// # Notes
-///
-/// This function is substitute for nightly-only [`range`](std::slice::range).
-///
-/// # Panics
-///
-/// Panics in the following cases.
-///
-/// - Range start and end is reverse order
-/// - Range end is greater than bounds end
-#[track_caller]
-pub(crate) fn slice_range<R>(range: R, bounds: RangeTo<usize>) -> Range<usize>
+/// Returns raw capped range.
+fn range_cap_raw<R>(range: &R, len: usize) -> Range<usize>
 where
     R: RangeBounds<usize>,
 {
@@ -132,17 +146,12 @@ where
         Bound::Excluded(x) => *x + 1,
         Bound::Unbounded => 0,
     };
+
     let e = match range.end_bound() {
         Bound::Included(x) => *x + 1,
         Bound::Excluded(x) => *x,
-        Bound::Unbounded => bounds.end,
+        Bound::Unbounded => len,
     };
 
-    if s > e {
-        panic!(msg::range_order_rev!(), s, e);
-    } else if e > bounds.end {
-        panic!(msg::range_end_gt_bounds_end!(), e, bounds.end);
-    } else {
-        s..e
-    }
+    s..e
 }

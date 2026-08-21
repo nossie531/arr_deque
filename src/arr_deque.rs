@@ -487,7 +487,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     where
         R: RangeBounds<usize>,
     {
-        let (s1, s2) = self.to_slices(&util::slice_range(range, ..self.len)).into();
+        let (s1, s2) = self.to_slices(&util::range_slice(range, ..self.len)).into();
         Iter::new(s1.iter(), s2.iter())
     }
 
@@ -517,7 +517,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         R: RangeBounds<usize>,
     {
         let (s1, s2) = self
-            .to_slices_mut(&util::slice_range(range, ..self.len))
+            .to_slices_mut(&util::range_slice(range, ..self.len))
             .into();
         IterMut::new(s1.iter_mut(), s2.iter_mut())
     }
@@ -1376,7 +1376,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         R: RangeBounds<usize>,
     {
         let len = self.len();
-        Drain::new(self, util::slice_range(range, ..len))
+        Drain::new(self, util::range_slice(range, ..len))
     }
 
     /// Rearranges the internal storage to one contiguous slice.
@@ -1501,7 +1501,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         R: RangeBounds<usize>,
     {
         let rx = &self.all();
-        let ry = &util::range_cap(range, &..self.len);
+        let ry = &util::range_cap(range, self.len);
         let target = &util::range_prod(rx, ry);
         let rests = &util::range_diff(rx, ry);
         let slim_dir = Dir::dec(rests[0].len() <= rests[1].len());
@@ -1523,7 +1523,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         R: RangeBounds<usize>,
     {
         let rx = &self.all();
-        let ry = &util::range_cap(range, &..self.len);
+        let ry = &util::range_cap(range, self.len);
         for i in util::range_prod(rx, ry) {
             let buf_idx = self.to_buf_idx(i);
             let element = unsafe { self.copy_buf_val(buf_idx) };
@@ -1621,6 +1621,13 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// Slides values in range.
     fn slide_range(&mut self, range: &Range<DeqIdx>, offset: Offset) {
         debug_assert!(range.len() + offset.len() <= N);
+
+        // Guard for common case performance.
+        if range.is_empty() {
+            return;
+        }
+
+        // Destruct offset value.
         let inc = offset.is_inc();
         let len = offset.len();
 
@@ -1709,7 +1716,7 @@ impl<T, const N: usize> Default for ArrDeque<T, N> {
 
 impl<T, const N: usize> Drop for ArrDeque<T, N> {
     fn drop(&mut self) {
-        self.clear();
+        self.drop_elements(&..);
     }
 }
 
