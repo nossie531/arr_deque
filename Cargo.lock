@@ -167,9 +167,9 @@ dependencies = [
 
 [[package]]
 name = "rich_range"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91891930bfc4a267630d484058e39ca72fd5138b00fa405c2724e4a0bfda8383"
+checksum = "319e42e1295dd395a9a541c9a2706974a0ee4992047d9eaf053e72532cb7e8f0"
 dependencies = [
  "rustdoc_copy",
 ]

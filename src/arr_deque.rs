@@ -1564,8 +1564,10 @@ impl<T, const N: usize> ArrDeque<T, N> {
 
     /// Returns two physical ranges from one logical range.
     fn to_buf_ranges(&self, range: &Range<DeqIdx>) -> [Range<BufIdx>; 2] {
-        let ranges = util::range_cut(range, self.wrap_index());
-        ranges.map(|r| self.to_buf_range(&r))
+        let [r1, r2] = util::range_cut(range, self.wrap_index());
+        let r1 = self.to_buf_range(&r1);
+        let r2 = self.to_buf_range(&r2);
+        [r1, r2]
     }
 
     /// Returns two slices from one logical range.

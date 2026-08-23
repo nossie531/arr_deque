@@ -37,9 +37,10 @@ pub(crate) fn sub_mod(x: usize, y: usize, m: usize) -> usize {
 
 /// Returns the two cutted ranges.
 pub(crate) fn range_cut(range: &Range<usize>, pos: usize) -> [Range<usize>; 2] {
-    let ranges = <[_; _]>::from(rw::refr(range).cut(&pos));
-    let ranges = ranges.map(Option::unwrap_or_default);
-    ranges.map(|x| x.try_into().unwrap())
+    let ranges = rw::refr(range).cut(&pos);
+    let rx = ranges.0.unwrap_or_default().try_into().unwrap();
+    let ry = ranges.1.unwrap_or_default().try_into().unwrap();
+    [rx, ry]
 }
 
 /// Returns the product of two ranges.
