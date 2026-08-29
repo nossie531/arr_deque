@@ -5,8 +5,6 @@ use crate::*;
 use core::ops::RangeTo;
 use core::ops::{Bound, Range, RangeBounds};
 use rich_range::prelude::*;
-use subject::exts::UpgetExt;
-use subject::prelude::*;
 
 /// Returns offset value modulared by `m`.
 pub(crate) fn offset_mod(value: usize, offset: Offset, m: usize) -> usize {
@@ -51,7 +49,9 @@ pub(crate) fn range_prod(rx: &Range<usize>, ry: &Range<usize>) -> Range<usize> {
 /// Returns the difference of two ranges.
 pub(crate) fn range_diff(rx: &Range<usize>, ry: &Range<usize>) -> [Range<usize>; 2] {
     let ranges = rw::refr(rx).diff(rw::refr(ry));
-    <[_; _]>::from(ranges).map(|opt| opt.map_or(0..0, |r| r.try_into().unwrap()))
+    let ret1 = ranges.0.unwrap_or_default().try_into().unwrap();
+    let ret2 = ranges.1.unwrap_or_default().try_into().unwrap();
+    [ret1, ret2]
 }
 
 /// Returns capped range.
@@ -104,18 +104,10 @@ pub(crate) fn chained_nth<I>(iters: [&mut I; 2], n: usize) -> Option<I::Item>
 where
     I: ExactSizeIterator,
 {
-    let mut rest = n;
-    for iter in iters {
-        let progress = rest.min(iter.len());
-        let new_rest = rest - progress;
-        if let Some(val) = iter.nth(progress) {
-            return Some(val);
-        }
-
-        rest = new_rest;
-    }
-
-    None
+    let fst_part = n.min(iters[0].len());
+    iters[0]
+        .nth(fst_part)
+        .or_else(|| iters[1].nth(n - fst_part))
 }
 
 /// Returns `n`th item of chained iterators from the end.
@@ -123,18 +115,10 @@ pub(crate) fn chained_nth_back<I>(iters: [&mut I; 2], n: usize) -> Option<I::Ite
 where
     I: DoubleEndedIterator + ExactSizeIterator,
 {
-    let mut rest = n;
-    for iter in S(iters).upget(|x| x.reverse()) {
-        let progress = rest.min(iter.len());
-        let new_rest = rest - progress;
-        if let Some(val) = iter.nth_back(progress) {
-            return Some(val);
-        }
-
-        rest = new_rest;
-    }
-
-    None
+    let fst_part = n.min(iters[1].len());
+    iters[1]
+        .nth_back(fst_part)
+        .or_else(|| iters[0].nth_back(n - fst_part))
 }
 
 /// Returns raw capped range.

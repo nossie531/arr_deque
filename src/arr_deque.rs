@@ -888,7 +888,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
             return None;
         }
 
-        let removing = unsafe { self.copy_buf_val(self.to_buf_idx(index)) };
+        let removing = unsafe { self.buf_copy_at(self.to_buf_idx(index)) };
         self.clear_elements_without_drops(&(index..=index));
         Some(removing)
     }
@@ -965,7 +965,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
 
         // Insert value.
         unsafe {
-            self.write_buf_val(self.to_buf_idx(index), value);
+            self.buf_write_at(self.to_buf_idx(index), value);
         }
 
         // Return reference.
@@ -1477,15 +1477,6 @@ impl<T, const N: usize> ArrDeque<T, N> {
 
 /// Crate public methods.
 impl<T, const N: usize> ArrDeque<T, N> {
-    /// Returns an element.
-    ///
-    /// # Safety
-    ///
-    /// This methods copy value. So be careful about aliasing rules.
-    pub(crate) unsafe fn copy_val(&self, index: DeqIdx) -> T {
-        unsafe { self.copy_buf_val(self.to_buf_idx(index)) }
-    }
-
     /// Clear elements in given range.
     pub(crate) fn clear_elements<R>(&mut self, range: &R)
     where
@@ -1525,10 +1516,17 @@ impl<T, const N: usize> ArrDeque<T, N> {
         let rx = &self.all();
         let ry = &util::range_cap(range, self.len);
         for i in util::range_prod(rx, ry) {
-            let buf_idx = self.to_buf_idx(i);
-            let element = unsafe { self.copy_buf_val(buf_idx) };
-            mem::drop(element);
+            unsafe { self.buf_drop_at(self.to_buf_idx(i)) };
         }
+    }
+
+    /// Returns an element.
+    ///
+    /// # Safety
+    ///
+    /// This methods copy value. So be careful about aliasing rules.
+    pub(crate) unsafe fn copy_val(&self, index: DeqIdx) -> T {
+        unsafe { self.buf_copy_at(self.to_buf_idx(index)) }
     }
 }
 
@@ -1656,24 +1654,48 @@ impl<T, const N: usize> ArrDeque<T, N> {
         }
     }
 
-    /// Returns value at given index.
+    /// Returns copied value at given index.
     ///
     /// # Safety
     ///
-    /// This method copy value. So be careful about aliasing rules.
-    unsafe fn copy_buf_val(&self, index: BufIdx) -> T {
+    /// This method duplicates value bypassing borrow checker.
+    /// So be careful about aliasing rules.
+    unsafe fn buf_copy_at(&self, index: BufIdx) -> T {
         unsafe { (self.buf.as_ptr().add(index) as *const T).read() }
     }
 
-    /// Write value to index.
+    /// Returns reference at given index.
     ///
     /// # Safety
     ///
-    /// This method delete existing value without destructor.
-    unsafe fn write_buf_val(&mut self, index: BufIdx, value: T) {
+    /// This method creates immutable reference bypassing borrow checker.
+    /// So be careful about aliasing rules.
+    unsafe fn buf_ref_at(&self, index: BufIdx) -> &T {
+        unsafe { &*(self.buf.as_ptr().add(index) as *const T) }
+    }
+
+    /// Write value at given index.
+    ///
+    /// # Safety
+    ///
+    /// This method overwrites existing value without destructor.
+    /// So be careful value lost without drops.
+    unsafe fn buf_write_at(&mut self, index: BufIdx, value: T) {
         let value = MaybeUninit::new(value);
         unsafe {
             ((&mut self.buf[index]) as *mut MaybeUninit<T>).write(value);
+        }
+    }
+
+    /// Drop value at given index.
+    ///
+    /// # Safety
+    ///
+    /// This method drop value manually.
+    /// So be careful about double free and use after free.
+    unsafe fn buf_drop_at(&mut self, index: BufIdx) {
+        unsafe {
+            self.buf[index].assume_init_drop();
         }
     }
 }
@@ -1690,9 +1712,8 @@ where
         for range in self.to_buf_ranges(&(0..self.len)) {
             for index in range {
                 unsafe {
-                    let value = self.copy_buf_val(index);
-                    ret.write_buf_val(index, value.clone());
-                    mem::forget(value);
+                    let value = self.buf_ref_at(index).clone();
+                    ret.buf_write_at(index, value);
                 }
             }
         }

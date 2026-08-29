@@ -10,7 +10,7 @@ keywords = ["deque"]
 categories = ["no-std", "data-structures"]
 
 [dependencies]
-rich_range = "0.4"
+rich_range = "0.5"
 subject = "0.1"
 
 [dev-dependencies]
