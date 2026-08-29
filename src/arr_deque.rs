@@ -1660,7 +1660,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     ///
     /// # Safety
     ///
-    /// This methods copy value. So be careful about aliasing rules.
+    /// This method copy value. So be careful about aliasing rules.
     unsafe fn copy_buf_val(&self, index: BufIdx) -> T {
         unsafe { (self.buf.as_ptr().add(index) as *const T).read() }
     }
@@ -1669,7 +1669,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     ///
     /// # Safety
     ///
-    /// This methods delete existing value without destructor.
+    /// This method delete existing value without destructor.
     unsafe fn write_buf_val(&mut self, index: BufIdx, value: T) {
         let value = MaybeUninit::new(value);
         unsafe {
