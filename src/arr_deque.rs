@@ -1661,7 +1661,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// This method duplicates value bypassing borrow checker.
     /// So be careful about aliasing rules.
     unsafe fn buf_copy_at(&self, index: BufIdx) -> T {
-        unsafe { (self.buf.as_ptr().add(index) as *const T).read() }
+        unsafe { self.buf[index].assume_init_read() }
     }
 
     /// Returns reference at given index.
@@ -1671,7 +1671,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// This method creates immutable reference bypassing borrow checker.
     /// So be careful about aliasing rules.
     unsafe fn buf_ref_at(&self, index: BufIdx) -> &T {
-        unsafe { &*(self.buf.as_ptr().add(index) as *const T) }
+        unsafe { self.buf[index].assume_init_ref() }
     }
 
     /// Write value at given index.
@@ -1681,10 +1681,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// This method overwrites existing value without destructor.
     /// So be careful value lost without drops.
     unsafe fn buf_write_at(&mut self, index: BufIdx, value: T) {
-        let value = MaybeUninit::new(value);
-        unsafe {
-            ((&mut self.buf[index]) as *mut MaybeUninit<T>).write(value);
-        }
+        self.buf[index].write(value);
     }
 
     /// Drop value at given index.
@@ -1694,9 +1691,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// This method drop value manually.
     /// So be careful about double free and use after free.
     unsafe fn buf_drop_at(&mut self, index: BufIdx) {
-        unsafe {
-            self.buf[index].assume_init_drop();
-        }
+        unsafe { self.buf[index].assume_init_drop() }
     }
 }
 
