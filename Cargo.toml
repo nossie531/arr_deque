@@ -11,7 +11,7 @@ categories = ["no-std", "data-structures"]
 
 [dependencies]
 rich_range = "0.5"
-subject = "0.1"
+subject = "0.2"
 
 [dev-dependencies]
 rand = "0.9"

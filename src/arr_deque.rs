@@ -1608,8 +1608,8 @@ impl<T, const N: usize> ArrDeque<T, N> {
 
         // Calculate update informations.
         let work_range = work_range_start..(work_range_start + rotation_len);
-        let work_offset_dir = S(offset.dir()).map_if(!use_fwd, Dir::not);
-        let start_offset_dir = S(offset.dir()).map_if(use_fwd, Dir::not);
+        let work_offset_dir = S(offset.dir()).map_if(|_| !use_fwd, Dir::not);
+        let start_offset_dir = S(offset.dir()).map_if(|_| use_fwd, Dir::not);
         let work_offset = Offset::new(work_offset_dir, N - self.len);
         let start_offset = Offset::new(start_offset_dir, rotation_len);
 
@@ -1638,7 +1638,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         let ranges = array::from_fn::<_, 4, _>(|_| ranges.next().unwrap());
 
         // Slide values in each ranges.
-        for range in S(ranges).upget_if(inc, |x| x.reverse()) {
+        for range in S(ranges).upget_if(|_| inc, |x| x.reverse()) {
             let dst_start = util::offset_mod(range.start, offset, N);
             self.move_range(&range, dst_start);
         }
