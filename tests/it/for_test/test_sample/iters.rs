@@ -1,10 +1,11 @@
 use crate::for_test::*;
 
 pub fn all() -> impl Iterator<Item = ts::IterBuilder> {
-    let deques = ts::deques::all();
-    deques
+    let default = ts::IterBuilder::default();
+    let all_deque_vs_skip = ts::deques::all()
         .map(|x| ts::IterBuilder::default().with_deque(x))
-        .flat_map(each_skips)
+        .flat_map(each_skips);
+    [default].into_iter().chain(all_deque_vs_skip)
 }
 
 fn each_skips(builder: ts::IterBuilder) -> impl Iterator<Item = ts::IterBuilder> {

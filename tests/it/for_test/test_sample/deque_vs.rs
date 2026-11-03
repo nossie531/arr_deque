@@ -14,8 +14,7 @@ pub fn each_indicies<T, const N: usize>(
 where
     T: Clone,
 {
-    let (len, max) = (deque.len(), deque.capacity());
-    ts::indicies(len, max).map(move |i| (deque.clone(), i))
+    ts::indicies(deque.len()).map(move |i| (deque.clone(), i))
 }
 
 pub fn each_indicies_more<T, const N: usize>(
@@ -33,8 +32,7 @@ pub fn each_index_pairs<T, const N: usize>(
 where
     T: Clone,
 {
-    let (len, max) = (deque.len(), deque.capacity());
-    ts::index_pairs(len, max).map(move |(i, j)| (deque.clone(), i, j))
+    ts::index_pairs(deque.len()).map(move |(i, j)| (deque.clone(), i, j))
 }
 
 pub fn each_ranges<T, const N: usize>(

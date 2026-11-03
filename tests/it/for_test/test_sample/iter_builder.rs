@@ -51,45 +51,72 @@ impl IterBuilder {
 
     pub fn each_index(self) -> impl Iterator<Item = (Self, usize)> {
         let skiped = self.head_skip + self.tail_skip;
-        let len = self.deque().len() - skiped;
-        let max = self.deque().capacity() - skiped;
-        let ns = ts::indicies(len, max);
-        ns.map(move |x| (self.clone(), x))
+        let len = self.arr_deque.as_ref().map_or(0, ArrDeque::len) - skiped;
+        let indicies = ts::indicies(len);
+        indicies.map(move |x| (self.clone(), x))
     }
 
     pub fn build_iter(&self) -> Iter<'_, ts::Val> {
+        if self.is_empty() {
+            return Iter::default();
+        }
+
         let deque = self.arr_deque.as_ref().unwrap();
         let result = deque.iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_into_iter(&self) -> IntoIter<ts::Val, { ts::CAPACITY }> {
+        if self.is_empty() {
+            return ArrDeque::new().into_iter();
+        }
+
         let deque = self.arr_deque.as_ref().unwrap().clone();
         let result = deque.into_iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_master_iter(&self) -> MasterIter<'_, ts::Val> {
+        if self.is_empty() {
+            return MasterIter::default();
+        }
+
         let deque = self.vec_deque.as_ref().unwrap();
         let result = deque.iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_master_into_iter(&self) -> MasterIntoIter<ts::Val> {
+        if self.is_empty() {
+            return VecDeque::new().into_iter();
+        }
+
         let deque = self.vec_deque.as_ref().unwrap().clone();
         let result = deque.into_iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_iter_mut(&mut self) -> IterMut<'_, ts::Val> {
+        if self.is_empty() {
+            return IterMut::default();
+        }
+
         let deque = self.arr_deque.as_mut().unwrap();
         let result = deque.iter_mut();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_master_iter_mut(&mut self) -> MasterIterMut<'_, ts::Val> {
+        if self.is_empty() {
+            return MasterIterMut::default();
+        }
+
         let deque = self.vec_deque.as_mut().unwrap();
         let result = deque.iter_mut();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
+    }
+
+    fn is_empty(&self) -> bool {
+        self.arr_deque.is_none()
     }
 }

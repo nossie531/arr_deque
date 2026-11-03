@@ -1,8 +1,7 @@
 use crate::for_test::*;
 use std::ops::Range;
 
-pub fn indicies(len: usize, max: usize) -> impl Iterator<Item = usize> {
-    assert!(len <= max);
+pub fn indicies(len: usize) -> impl Iterator<Item = usize> {
     const PLUS_ALPHA: usize = 3;
     let insides = indicies_inside(len);
     let outsides = indicies_outside(len, len + PLUS_ALPHA);
@@ -30,8 +29,8 @@ pub fn indicies_outside(len: usize, max: usize) -> impl Iterator<Item = usize> {
     [normal_ob_index, insert_ob_index, more_ob_index].into_iter()
 }
 
-pub fn index_pairs(len: usize, max: usize) -> impl Iterator<Item = (usize, usize)> {
-    tu::grid_iter!(indicies(len, max), indicies(len, max))
+pub fn index_pairs(len: usize) -> impl Iterator<Item = (usize, usize)> {
+    tu::grid_iter!(indicies(len), indicies(len))
 }
 
 pub fn ranges(len: usize) -> impl Iterator<Item = Range<usize>> {
