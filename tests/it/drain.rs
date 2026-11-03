@@ -13,9 +13,9 @@ fn fmt() {
 
 #[test]
 fn next() {
-    for ref mut builder in ts::drains::all() {
+    for builder in ts::drains::all() {
         // Arrange.
-        let mut builder = (builder.clone(), builder.clone());
+        let mut builder = tu::dup(builder);
         let target = &mut builder.0.build_target();
         let master = &mut builder.1.build_master();
         // Act.
@@ -28,9 +28,9 @@ fn next() {
 
 #[test]
 fn next_back() {
-    for ref mut builder in ts::drains::all() {
+    for builder in ts::drains::all() {
         // Arrange.
-        let mut builder = (builder.clone(), builder.clone());
+        let mut builder = tu::dup(builder);
         let target = &mut builder.0.build_target();
         let master = &mut builder.1.build_master();
         // Act.
@@ -43,9 +43,9 @@ fn next_back() {
 
 #[test]
 fn size_hint() {
-    for ref mut builder in ts::drains::all() {
+    for builder in ts::drains::all() {
         // Arrange.
-        let mut builder = (builder.clone(), builder.clone());
+        let mut builder = tu::dup(builder);
         let target = &mut builder.0.build_target();
         let master = &mut builder.1.build_master();
         // Act.
