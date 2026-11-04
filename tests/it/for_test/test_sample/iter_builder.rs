@@ -14,18 +14,6 @@ pub struct IterBuilder {
 }
 
 impl IterBuilder {
-    pub fn deque(&self) -> &ts::SampleDeque {
-        self.arr_deque.as_ref().unwrap()
-    }
-
-    pub fn head_skip(&self) -> usize {
-        self.head_skip
-    }
-
-    pub fn tail_skip(&self) -> usize {
-        self.tail_skip
-    }
-
     pub fn with_deque(self, value: ts::SampleDeque) -> Self {
         let vec_deque = VecDeque::from_iter(value.iter().cloned());
         Self {
@@ -47,6 +35,18 @@ impl IterBuilder {
             tail_skip: value,
             ..self
         }
+    }
+
+    pub fn deque(&self) -> &ts::SampleDeque {
+        self.arr_deque.as_ref().unwrap()
+    }
+
+    pub fn head_skip(&self) -> usize {
+        self.head_skip
+    }
+
+    pub fn tail_skip(&self) -> usize {
+        self.tail_skip
     }
 
     pub fn each_index(self) -> impl Iterator<Item = (Self, usize)> {

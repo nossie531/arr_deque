@@ -25,14 +25,6 @@ impl<T> DrainBuilder<T> {
         }
     }
 
-    pub fn deque(&self) -> &ArrDeque<T, { ts::CAPACITY }> {
-        self.arr_deque.as_ref().unwrap()
-    }
-
-    pub fn range(&self) -> &Range<usize> {
-        self.range.as_ref().unwrap()
-    }
-
     pub fn with_deque(self, value: ArrDeque<T, { ts::CAPACITY }>) -> Self
     where
         T: Clone,
@@ -64,6 +56,14 @@ impl<T> DrainBuilder<T> {
             tail_skip: value,
             ..self
         }
+    }
+
+    pub fn deque(&self) -> &ArrDeque<T, { ts::CAPACITY }> {
+        self.arr_deque.as_ref().unwrap()
+    }
+
+    pub fn range(&self) -> &Range<usize> {
+        self.range.as_ref().unwrap()
     }
 
     pub fn build_target(&mut self) -> Drain<'_, T, { ts::CAPACITY }> {
