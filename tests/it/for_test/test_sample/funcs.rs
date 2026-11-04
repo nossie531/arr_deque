@@ -30,7 +30,8 @@ pub fn indicies_outside(len: usize, max: usize) -> impl Iterator<Item = usize> {
 }
 
 pub fn index_pairs(len: usize) -> impl Iterator<Item = (usize, usize)> {
-    tu::grid_iter!(indicies(len), indicies(len))
+    let indicies = indicies(len).collect::<Vec<_>>();
+    tu::cross_iter(indicies)
 }
 
 pub fn ranges(len: usize) -> impl Iterator<Item = Range<usize>> {
@@ -41,7 +42,7 @@ pub fn ranges(len: usize) -> impl Iterator<Item = Range<usize>> {
 
 pub fn ranges_inside(len: usize) -> impl Iterator<Item = Range<usize>> {
     let indicies = indicies_inside(len).collect::<Vec<_>>();
-    tu::grid_iter!(indicies.clone(), indicies.clone())
+    tu::cross_iter(indicies)
         .map(|(s, e)| s..e)
         .filter(|r| !r.is_empty())
         .chain((len == 0).then_some(0..0))

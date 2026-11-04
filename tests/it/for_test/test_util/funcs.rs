@@ -74,3 +74,21 @@ where
 {
     Vec::from_iter(iter::repeat_with(T::default).take(n))
 }
+
+pub fn cross_iter<I>(iter: I) -> impl Iterator<Item = (I::Item, I::Item)>
+where 
+    I: IntoIterator + Clone + 'static,
+    I::Item: Clone,
+{
+    let iter = tu::dup(iter);
+    grid_iter(iter.0, iter.1)    
+}
+
+pub fn grid_iter<IX, IY>(x: IX, y: IY) -> impl Iterator<Item = (IX::Item, IY::Item)>
+where 
+    IX: IntoIterator,
+    IY: IntoIterator + Clone + 'static,
+    IX::Item: Clone,
+{
+    x.into_iter().flat_map(move |ex| y.clone().into_iter().map(move |ey| (ex.clone(), ey)))
+}
