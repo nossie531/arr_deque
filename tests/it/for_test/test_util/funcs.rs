@@ -80,7 +80,7 @@ where
     I: IntoIterator + Clone + 'static,
     I::Item: Clone,
 {
-    let iter = tu::dup(iter);
+    let iter = dup(iter);
     grid_iter(iter.0, iter.1)    
 }
 
