@@ -38,16 +38,6 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
         self.inner.pop_front()
     }
 
-    #[inline]
-    fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        if self.inner.len() <= n {
-            return None;
-        };
-
-        self.inner.clear_elements(&(0..n));
-        self.inner.pop_front()
-    }
-
     fn size_hint(&self) -> (usize, Option<usize>) {
         let len = self.inner.len();
         (len, Some(len))
@@ -59,6 +49,16 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
 
     fn last(mut self) -> Option<Self::Item> {
         self.inner.pop_back()
+    }
+
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        if self.inner.len() <= n {
+            return None;
+        };
+
+        self.inner.clear_elements(&(0..n));
+        self.inner.pop_front()
     }
 }
 

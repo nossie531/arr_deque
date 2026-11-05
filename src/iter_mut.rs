@@ -75,11 +75,6 @@ impl<'a, T> Iterator for IterMut<'a, T> {
         self.nth(0)
     }
 
-    #[inline]
-    fn nth(&mut self, n: usize) -> Option<Self::Item> {
-        util::chained_nth([&mut self.part1, &mut self.part2], n)
-    }
-
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.len(), Some(self.len()))
     }
@@ -93,5 +88,10 @@ impl<'a, T> Iterator for IterMut<'a, T> {
         Self: Sized,
     {
         self.next_back()
+    }
+
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        util::chained_nth([&mut self.part1, &mut self.part2], n)
     }
 }
