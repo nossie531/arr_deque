@@ -442,7 +442,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         Iter::new(s1.iter(), s2.iter())
     }
 
-    /// Returns an mutable iterator.
+    /// Returns a mutable iterator.
     ///
     /// See [`VecDeque::iter_mut`].
     ///
@@ -1524,7 +1524,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     ///
     /// # Safety
     ///
-    /// This methods copy value. So be careful about aliasing rules.
+    /// These methods copy value. So be careful about aliasing rules.
     pub(crate) unsafe fn copy_val(&self, index: DeqIdx) -> T {
         unsafe { self.buf_copy_at(self.to_buf_idx(index)) }
     }
@@ -1606,7 +1606,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
             (Dir::Inc, true) => rotation_len_bwd,
         };
 
-        // Calculate update informations.
+        // Calculate update information.
         let work_range = work_range_start..(work_range_start + rotation_len);
         let work_offset_dir = S(offset.dir()).map_if(|_| !use_fwd, Dir::not);
         let start_offset_dir = S(offset.dir()).map_if(|_| use_fwd, Dir::not);
@@ -1637,7 +1637,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         let ranges = &mut ranges.flat_map(|r| util::range_cut(&r, cut_pos));
         let ranges = array::from_fn::<_, 4, _>(|_| ranges.next().unwrap());
 
-        // Slide values in each ranges.
+        // Slide values in each range.
         for range in S(ranges).upget_if(|_| inc, |x| x.reverse()) {
             let dst_start = util::offset_mod(range.start, offset, N);
             self.move_range(&range, dst_start);
