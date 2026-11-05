@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No items.
+### Fixed
+
+- `IterMut::fmt` (wrong contents)
 
 ## [0.4.5] - 2026-09-09
 

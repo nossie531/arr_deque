@@ -29,7 +29,7 @@ where
     T: Debug,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("Iter")
+        f.debug_tuple("IterMut")
             .field(&self.part1)
             .field(&self.part2)
             .finish()
