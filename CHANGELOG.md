@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `IterMut::fmt` (wrong contents)
 
+### Changed
+
+- Some refactoring.
+- Polish documentations.
+
 ## [0.4.5] - 2026-09-09
 
 ### Changed
@@ -65,9 +70,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.2] - 2026-06-02
 
+### Changed
+
 - Polish documentations.
 
 ## [0.1.1] - 2026-06-02
+
+### Changed
 
 - Polish documentations.
 
