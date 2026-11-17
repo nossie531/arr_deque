@@ -1,5 +1,7 @@
 use crate::for_test::*;
-use std::ops::Range;
+use std::ops::{Range, Rem};
+
+const ANY_KEY: i32 = 42;
 
 pub fn each_ring_starts(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::SampleDeque, usize)> {
     ch::RingBufAlign::all().map(move |x| {
@@ -44,6 +46,26 @@ where
     ts::ranges(deque.len()).map(move |r| (deque.clone(), r))
 }
 
+pub fn each_predicates<T, const N: usize>(
+    deque: ts::ArrDeque<T, N>,
+) -> impl Iterator<Item = (ts::ArrDeque<T, N>, Box<dyn Fn(&T) -> bool>)>
+where
+    T: Clone,
+    for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
+{
+    ts::predicates().map(move |f| (deque.clone(), f))
+}
+
+pub fn each_predicates_mut<T, const N: usize>(
+    deque: ts::ArrDeque<T, N>,
+) -> impl Iterator<Item = (ts::ArrDeque<T, N>, Box<dyn Fn(&mut T) -> bool>)>
+where
+    T: Clone,
+    for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
+{
+    ts::predicates_mut().map(move |f| (deque.clone(), f))
+}
+
 pub fn each_contains_keys(
     deque: ts::SampleDeque,
 ) -> impl Iterator<Item = (ts::SampleDeque, ts::Val)> {
@@ -52,7 +74,6 @@ pub fn each_contains_keys(
         .collect::<Vec<_>>();
 
     let keys_unmatched = if deque.len() == 0 {
-        const ANY_KEY: i32 = 42;
         vec![ANY_KEY]
     } else {
         let any_index = keys_matched.len() / 2;
@@ -72,7 +93,6 @@ pub fn each_search_keys(
         .collect::<Vec<_>>();
 
     let keys_unmatched = if deque.len() == 0 {
-        const ANY_KEY: i32 = 42;
         vec![ANY_KEY]
     } else {
         let min_index = 0;
@@ -86,16 +106,4 @@ pub fn each_search_keys(
 
     let keys_all = keys_matched.into_iter().chain(keys_unmatched);
     keys_all.map(move |i| (deque.clone(), i))
-}
-
-pub fn each_predicates(
-    deque: ts::SampleDeque,
-) -> impl Iterator<Item = (ts::SampleDeque, Box<dyn Fn(&ts::Val) -> bool>)> {
-    ts::predicates().map(move |f| (deque.clone(), f))
-}
-
-pub fn each_predicates_mut(
-    deque: ts::SampleDeque,
-) -> impl Iterator<Item = (ts::SampleDeque, Box<dyn Fn(&mut ts::Val) -> bool>)> {
-    ts::predicates_mut().map(move |f| (deque.clone(), f))
 }

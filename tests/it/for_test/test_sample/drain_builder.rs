@@ -81,11 +81,11 @@ impl<T> DrainBuilder<T> {
     }
 }
 
-impl DrainBuilder<ts::TraceValNt> {
+impl DrainBuilder<ts::TraceValNt<()>> {
     pub fn build_traced_target(
         &mut self,
         tracer: &DropTracer,
-    ) -> Drain<'_, ts::TraceValNt, { ts::CAPACITY }> {
+    ) -> Drain<'_, ts::TraceValNt<()>, { ts::CAPACITY }> {
         let deque = self.arr_deque.as_mut().unwrap();
         for item in deque.iter_mut() {
             tracer.trace_on(item.base_mut());

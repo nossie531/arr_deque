@@ -1,32 +1,44 @@
-use crate::for_test::*;
+use std::ops::Rem;
 use drop_tracer::prelude::*;
 use rand::distr::StandardUniform;
 use rand::prelude::*;
-use std::ops::Deref;
+use crate::for_test::*;
 
-#[derive(Clone)]
-pub(crate) struct TraceValNt(TraceVal<ts::Val>);
+#[derive(Clone, Eq, PartialEq)]
+pub(crate) struct TraceValNt<T>(TraceVal<T>);
 
-impl TraceValNt {
-    pub fn new(value: ts::Val, tracer: &DropTracer) -> Self {
-        Self(tracer.trace(value))
+impl<T> TraceValNt<T> {
+    pub fn new(value: T) -> Self {
+        Self(TraceVal::new(value))
     }
 
-    pub fn base_mut(&mut self) -> &mut TraceVal<ts::Val> {
+    pub fn with_tracer(mut self, tracer: &DropTracer) -> Self {
+        tracer.trace_on(&mut self.0);
+        self
+    }
+
+    pub fn base_mut(&mut self) -> &mut TraceVal<T> {
         &mut self.0
     }
-}
 
-impl Distribution<TraceValNt> for StandardUniform {
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> TraceValNt {
-        TraceValNt(TraceVal::new(rng.random()))
+    pub fn tag(value: &Self) -> TraceTag {
+        TraceVal::tag(&value.0)
     }
 }
 
-impl Deref for TraceValNt {
-    type Target = ts::Val;
+impl<'a> Rem<&'a ts::Val> for &'a TraceValNt<ts::Val> {
+    type Output = ts::Val;
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    fn rem(self, rhs: &ts::Val) -> Self::Output {
+        *self.0 % rhs
+    }
+}
+
+impl<T> Distribution<TraceValNt<T>> for StandardUniform
+where
+    StandardUniform: Distribution<T>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> TraceValNt<T> {
+        TraceValNt(TraceVal::new(rng.random()))
     }
 }

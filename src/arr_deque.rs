@@ -6,8 +6,7 @@ use core::array;
 use core::cmp::Ordering;
 use core::fmt::{Debug, Formatter};
 use core::hash::{Hash, Hasher};
-use core::mem;
-use core::mem::MaybeUninit;
+use core::mem::{self, MaybeUninit};
 use core::ops::{Index, IndexMut, Not, Range, RangeBounds};
 use core::ptr;
 use subject::exts::{MapExt, UpgetExt};
@@ -1513,9 +1512,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     where
         R: RangeBounds<usize>,
     {
-        let rx = &self.all();
-        let ry = &util::range_cap(range, self.len);
-        for i in util::range_prod(rx, ry) {
+        for i in util::range_cap(range, self.len) {
             unsafe { self.buf_drop_at(self.to_buf_idx(i)) };
         }
     }

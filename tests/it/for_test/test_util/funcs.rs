@@ -1,6 +1,8 @@
 use crate::for_test::*;
+use drop_tracer::prelude::*;
 use rand::distr::StandardUniform;
 use rand::prelude::*;
+use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::ops::{Mul, Rem, Sub};
@@ -76,19 +78,68 @@ where
 }
 
 pub fn cross_iter<I>(iter: I) -> impl Iterator<Item = (I::Item, I::Item)>
-where 
+where
     I: IntoIterator + Clone + 'static,
     I::Item: Clone,
 {
     let iter = dup(iter);
-    grid_iter(iter.0, iter.1)    
+    grid_iter(iter.0, iter.1)
 }
 
 pub fn grid_iter<IX, IY>(x: IX, y: IY) -> impl Iterator<Item = (IX::Item, IY::Item)>
-where 
+where
     IX: IntoIterator,
     IY: IntoIterator + Clone + 'static,
     IX::Item: Clone,
 {
-    x.into_iter().flat_map(move |ex| y.clone().into_iter().map(move |ey| (ex.clone(), ey)))
+    x.into_iter()
+        .flat_map(move |ex| y.clone().into_iter().map(move |ey| (ex.clone(), ey)))
+}
+
+pub fn tag_map<'a, I, T: 'a>(tags: I) -> BTreeMap<TraceTag, usize>
+where
+    I: Iterator<Item = &'a ts::TraceValNt<T>>,
+{
+    BTreeMap::from_iter(
+        tags.map(ts::TraceValNt::tag)
+            .enumerate()
+            .map(|(i, v)| (v, i)),
+    )
+}
+
+pub fn eq_logs(
+    xt: &DropTracer,
+    yt: &DropTracer,
+    xm: &BTreeMap<TraceTag, usize>,
+    ym: &BTreeMap<TraceTag, usize>,
+) -> bool {
+    let x_logs = xt.logs();
+    let y_logs = yt.logs();
+    let x_iter = &mut x_logs.iter();
+    let y_iter = &mut y_logs.iter();
+    loop {
+        match (x_iter.next(), y_iter.next()) {
+            (None, None) => return true,
+            (None, Some(_)) => return false,
+            (Some(_), None) => return false,
+            (Some(x), Some(y)) => {
+                let x_idx = xm.get(x.tag());
+                let y_idx = ym.get(y.tag());
+                if x.is_alloc() != y.is_alloc() {
+                    return false;
+                }
+
+                if !matches!(x_idx.zip(y_idx), Some((x, y)) if x == y) {
+                    return false;
+                }
+            }
+        }
+    }
+}
+
+pub fn trace_all<'a, I>(target: I, tracer: &DropTracer)
+where
+    I: Iterator<Item = &'a mut ts::TraceValNt<ts::Val>>,
+{
+    target.for_each(|x| tracer.trace_on(x.base_mut()));
 }

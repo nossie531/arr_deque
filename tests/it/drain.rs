@@ -58,7 +58,7 @@ fn size_hint() {
 
 #[test]
 fn drop() {
-    for ref mut builder in ts::drains::all_of::<ts::TraceValNt>() {
+    for ref mut builder in ts::drains::all_of::<ts::TraceValNt<()>>() {
         // Arrange.
         let tracer = DropTracer::new();
         let numof_remains = builder.deque().len() - builder.range().len();

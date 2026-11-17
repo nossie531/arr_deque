@@ -1,5 +1,5 @@
 use crate::for_test::*;
-use std::ops::Range;
+use std::ops::{Range, Rem};
 
 pub fn indicies(len: usize) -> impl Iterator<Item = usize> {
     const PLUS_ALPHA: usize = 3;
@@ -54,26 +54,31 @@ pub fn ranges_outside(len: usize) -> impl Iterator<Item = Range<usize>> {
     [broken_range, outbound_range].into_iter()
 }
 
-pub fn predicates() -> impl Iterator<Item = Box<dyn Fn(&ts::Val) -> bool>> {
+pub fn predicates<T>() -> impl Iterator<Item = Box<dyn Fn(&T) -> bool>>
+where
+    for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>, {
     {
-        let arr: [Box<dyn Fn(&i32) -> bool>; _] = [
+        let arr: [Box<dyn Fn(&T) -> bool>; _] = [
             Box::new(|_| true),
             Box::new(|_| false),
-            Box::new(|x| *x % 2 == 0),
-            Box::new(|x| *x % 2 == 1),
+            Box::new(|x| x % &2 == 0),
+            Box::new(|x| x % &2 == 1),
         ];
         arr
     }
     .into_iter()
 }
 
-pub fn predicates_mut() -> impl Iterator<Item = Box<dyn Fn(&mut ts::Val) -> bool>> {
+pub fn predicates_mut<T>() -> impl Iterator<Item = Box<dyn Fn(&mut T) -> bool>>
+where
+    for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
+{
     {
-        let arr: [Box<dyn Fn(&mut i32) -> bool>; _] = [
+        let arr: [Box<dyn Fn(&mut T) -> bool>; _] = [
             Box::new(|_| true),
             Box::new(|_| false),
-            Box::new(|x| *x % 2 == 0),
-            Box::new(|x| *x % 2 == 1),
+            Box::new(|x| &*x % &2 == 0),
+            Box::new(|x| &*x % &2 == 1),
         ];
         arr
     }

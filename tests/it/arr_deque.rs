@@ -316,31 +316,33 @@ fn binary_search_by_key() {
 
 #[test]
 fn clear() {
-    when_normal();
-    when_impl_drop_for_item();
-
-    fn when_normal() {
-        let target = &mut ts::deque::normal();
-        target.clear();
-        assert!(target.is_empty());
-    }
-
-    fn when_impl_drop_for_item() {
+    for ref mut target in ts::deques::all_of() {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of();
-        target.push_back(ts::TraceValNt::new(ts::VAL, tracer));
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
         // Act.
         target.clear();
+        master.clear();
         // Assert.
-        assert_eq!(tracer.living_count(), 0);
+        assert!(target.iter().eq(master.iter()));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
 #[test]
 fn pop_front() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         for ref mut target in ts::deques::all() {
@@ -355,11 +357,11 @@ fn pop_front() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of();
-        target.push_front(ts::TraceValNt::new(ts::VAL, tracer));
+        let target = &mut ts::deque::normal_tracable();
+        target.push_front(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
         // Act.
         let result = target.pop_front();
         // Assert.
@@ -372,7 +374,7 @@ fn pop_front() {
 #[test]
 fn pop_back() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         for ref mut target in ts::deques::all() {
@@ -387,11 +389,11 @@ fn pop_back() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of();
-        target.push_back(ts::TraceValNt::new(ts::VAL, tracer));
+        let target = &mut ts::deque::normal_tracable();
+        target.push_back(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
         // Act.
         let result = target.pop_back();
         // Assert.
@@ -404,7 +406,7 @@ fn pop_back() {
 #[test]
 fn pop_front_if() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         let targets = ts::deques::all_for_binary_search();
@@ -421,11 +423,11 @@ fn pop_front_if() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of();
-        target.push_front(ts::TraceValNt::new(ts::VAL, tracer));
+        let target = &mut ts::deque::normal_tracable();
+        target.push_front(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
         // Act.
         let result = target.pop_front_if(|_| true);
         // Assert.
@@ -438,7 +440,7 @@ fn pop_front_if() {
 #[test]
 fn pop_back_if() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         let targets = ts::deques::all_for_binary_search();
@@ -455,11 +457,11 @@ fn pop_back_if() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of();
-        target.push_back(ts::TraceValNt::new(ts::VAL, tracer));
+        let target = &mut ts::deque::normal_tracable();
+        target.push_back(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
         // Act.
         let result = target.pop_back_if(|_| true);
         // Assert.
@@ -582,7 +584,7 @@ fn push_back_mut() {
 #[test]
 fn remove() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         let targets = ts::deques::none_emptys();
@@ -599,10 +601,10 @@ fn remove() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of::<ts::TraceValNt>();
+        let target = &mut ts::deque::normal_tracable();
         let index = target.len() / 2;
         tracer.trace_on(target.get_mut(index).unwrap().base_mut());
         // Act.
@@ -663,7 +665,7 @@ fn swap() {
 #[test]
 fn swap_remove_front() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         let targets = ts::deques::looses();
@@ -680,13 +682,13 @@ fn swap_remove_front() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of::<ts::TraceValNt>();
+        let target = &mut ts::deque::normal_tracable();
         let index = target.len() / 2;
-        tracer.trace_on(target.get_mut(0).unwrap().base_mut());
-        tracer.trace_on(target.get_mut(index).unwrap().base_mut());
+        tracer.trace_on(target[0].base_mut());
+        tracer.trace_on(target[index].base_mut());
         // Act.
         let result = target.swap_remove_front(index);
         // Assert.
@@ -699,7 +701,7 @@ fn swap_remove_front() {
 #[test]
 fn swap_remove_back() {
     when_normal();
-    when_impl_drop_for_item();
+    test_drop();
 
     fn when_normal() {
         let targets = ts::deques::looses();
@@ -716,13 +718,13 @@ fn swap_remove_back() {
         }
     }
 
-    fn when_impl_drop_for_item() {
+    fn test_drop() {
         // Arrange.
         let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_of::<ts::TraceValNt>();
+        let target = &mut ts::deque::normal_tracable();
         let index = target.len() / 2;
-        tracer.trace_on(target.get_mut(0).unwrap().base_mut());
-        tracer.trace_on(target.get_mut(index).unwrap().base_mut());
+        tracer.trace_on(target[0].base_mut());
+        tracer.trace_on(target[index].base_mut());
         // Act.
         let result = target.swap_remove_back(index);
         // Assert.
@@ -766,31 +768,28 @@ fn rotate_right() {
 
 #[test]
 fn truncate() {
-    when_normal();
-    when_impl_drop_for_item();
-
-    fn when_normal() {
-        let targets = ts::deques::all();
-        let patterns = ts::deque_vs::each_indicies;
-        for (ref mut target, index) in targets.flat_map(patterns) {
-            // Arrange.
-            let master = &mut ch::master(target);
-            // Act.
-            target.truncate(index);
-            master.truncate(index);
-            // Assert.
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn when_impl_drop_for_item() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_indicies;
+    for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_traced(tracer);
+        let master = &mut ch::master(target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
         // Act.
-        target.truncate(ts::NORMAL_LEN / 2);
+        target.truncate(index);
+        master.truncate(index);
         // Assert.
-        assert_eq!(tracer.living_count(), ts::NORMAL_LEN / 2);
+        assert!(target.iter().eq(master.iter()));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
@@ -850,16 +849,26 @@ fn resize() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all();
+        let targets = ts::deques::all_of();
         let patterns = ts::deque_vs::each_indicies_more;
         for (ref mut target, len) in targets.flat_map(patterns) {
             // Arrange.
             let master = &mut ch::master(target);
+            let target_tracer = &DropTracer::new();
+            let master_tracer = &DropTracer::new();
+            let target_tags = tu::tag_map(target.iter());
+            let master_tags = tu::tag_map(master.iter());
             // Act.
-            target.resize(len, ts::VAL);
-            master.resize(len, ts::VAL);
+            target.resize(len, ts::TraceValNt::new(ts::VAL));
+            master.resize(len, ts::TraceValNt::new(ts::VAL));
             // Assert.
             assert!(target.iter().eq(master.iter()));
+            assert!(tu::eq_logs(
+                &target_tracer,
+                &master_tracer,
+                &target_tags,
+                &master_tags
+            ));
         }
     }
 
@@ -877,16 +886,26 @@ fn resize_with() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all();
+        let targets = ts::deques::all_of();
         let patterns = ts::deque_vs::each_indicies_more;
         for (ref mut target, len) in targets.flat_map(patterns) {
             // Arrange.
             let master = &mut ch::master(target);
+            let target_tracer = &DropTracer::new();
+            let master_tracer = &DropTracer::new();
+            let target_tags = tu::tag_map(target.iter());
+            let master_tags = tu::tag_map(master.iter());
             // Act.
-            target.resize_with(len, || ts::VAL);
-            master.resize_with(len, || ts::VAL);
+            target.resize_with(len, || ts::TraceValNt::new(ts::VAL));
+            master.resize_with(len, || ts::TraceValNt::new(ts::VAL));
             // Assert.
             assert!(target.iter().eq(master.iter()));
+            assert!(tu::eq_logs(
+                &target_tracer,
+                &master_tracer,
+                &target_tags,
+                &master_tags
+            ));
         }
     }
 
@@ -899,17 +918,27 @@ fn resize_with() {
 }
 
 #[test]
-fn retain_xxx() {
-    let targets = ts::deques::all();
+fn retain() {
+    let targets = ts::deques::all_of();
     let patterns = ts::deque_vs::each_predicates;
     for (ref mut target, f) in targets.flat_map(patterns) {
         // Arrange.
         let master = &mut ch::master(target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
         // Act.
         target.retain(|x| f(x));
         master.retain(|x| f(x));
         // Assert.
         assert!(target.iter().eq(master.iter()));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
@@ -1038,31 +1067,24 @@ fn default() {
 
 #[test]
 fn drop() {
-    when_normal();
-    when_wrapped_then_drop_items_collect_order();
-
-    fn when_normal() {
-        let target = ts::deque::normal();
-        mem::drop(target);
-    }
-
-    fn when_wrapped_then_drop_items_collect_order() {
+    let targets = ts::deques::all_of::<ts::TraceValNt<ts::Val>>();
+    for target in targets {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = ts::deque::empty_of();
-        let mut target = ch::adjust_ring_start(target, ch::RingBufAlign::Wrap);
-        let vals = Vec::from_iter((0..ts::NORMAL_LEN).map(|_| tracer.trace(ts::VAL)));
-        let tags = Vec::from_iter(vals.iter().map(|x| TraceVal::tag(&x)));
-        target.extend(vals);
-
+        let master = ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
         // Act.
         mem::drop(target);
-
+        mem::drop(master);
         // Assert.
-        let logs = tracer.logs();
-        let drop_logs = logs.iter().filter(|x| !x.is_alloc());
-        let drop_tags = drop_logs.map(|x| x.tag().clone());
-        assert!(drop_tags.eq(tags));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
@@ -1351,8 +1373,8 @@ fn eq() {
     fn when_arr_ref() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
             let master = ch::master(&target);
-            let asis = target.eq(&&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
-            let tobe = master.eq(&&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let asis = target.eq(&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
             assert_eq!(asis, tobe);
         }
     }
@@ -1360,8 +1382,8 @@ fn eq() {
     fn when_arr_mut() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
             let master = ch::master(&target);
-            let asis = target.eq(&&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
-            let tobe = master.eq(&&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let asis = target.eq(&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
             assert_eq!(asis, tobe);
         }
     }
@@ -1397,7 +1419,7 @@ fn read() {
         assert!(result.as_ref().is_ok());
         // Assert reading contents.
         let read_cnt = result.unwrap();
-        assert!(read_cnt == to_read.len().min(buf_len));
+        assert_eq!(read_cnt, to_read.len().min(buf_len));
         assert_eq!(buf[0..read_cnt], to_read[0..read_cnt]);
     }
 }
