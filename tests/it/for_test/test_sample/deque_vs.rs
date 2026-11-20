@@ -10,45 +10,45 @@ pub fn each_ring_starts(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::Sam
     })
 }
 
-pub fn each_indicies<T, const N: usize>(
-    deque: ts::ArrDeque<T, N>,
-) -> impl Iterator<Item = (ts::ArrDeque<T, N>, usize)>
+pub fn each_indicies<T>(
+    deque: ts::SampleDequeGen<T>,
+) -> impl Iterator<Item = (ts::SampleDequeGen<T>, usize)>
 where
     T: Clone,
 {
     ts::indicies(deque.len()).map(move |i| (deque.clone(), i))
 }
 
-pub fn each_indicies_more<T, const N: usize>(
-    deque: ts::ArrDeque<T, N>,
-) -> impl Iterator<Item = (ts::ArrDeque<T, N>, usize)>
+pub fn each_indicies_more<T>(
+    deque: ts::SampleDequeGen<T>,
+) -> impl Iterator<Item = (ts::SampleDequeGen<T>, usize)>
 where
     T: Clone,
 {
     ts::indicies_more(deque.len(), deque.capacity()).map(move |i| (deque.clone(), i))
 }
 
-pub fn each_index_pairs<T, const N: usize>(
-    deque: ts::ArrDeque<T, N>,
-) -> impl Iterator<Item = (ts::ArrDeque<T, N>, usize, usize)>
+pub fn each_index_pairs<T>(
+    deque: ts::SampleDequeGen<T>,
+) -> impl Iterator<Item = (ts::SampleDequeGen<T>, usize, usize)>
 where
     T: Clone,
 {
     ts::index_pairs(deque.len()).map(move |(i, j)| (deque.clone(), i, j))
 }
 
-pub fn each_ranges<T, const N: usize>(
-    deque: ts::ArrDeque<T, N>,
-) -> impl Iterator<Item = (ts::ArrDeque<T, N>, Range<usize>)>
+pub fn each_ranges<T>(
+    deque: ts::SampleDequeGen<T>,
+) -> impl Iterator<Item = (ts::SampleDequeGen<T>, Range<usize>)>
 where
     T: Clone,
 {
     ts::ranges(deque.len()).map(move |r| (deque.clone(), r))
 }
 
-pub fn each_predicates<T, const N: usize>(
-    deque: ts::ArrDeque<T, N>,
-) -> impl Iterator<Item = (ts::ArrDeque<T, N>, Box<dyn Fn(&T) -> bool>)>
+pub fn each_predicates<T>(
+    deque: ts::SampleDequeGen<T>,
+) -> impl Iterator<Item = (ts::SampleDequeGen<T>, Box<dyn Fn(&T) -> bool>)>
 where
     T: Clone,
     for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
@@ -56,9 +56,9 @@ where
     ts::predicates().map(move |f| (deque.clone(), f))
 }
 
-pub fn each_predicates_mut<T, const N: usize>(
-    deque: ts::ArrDeque<T, N>,
-) -> impl Iterator<Item = (ts::ArrDeque<T, N>, Box<dyn Fn(&mut T) -> bool>)>
+pub fn each_predicates_mut<T>(
+    deque: ts::SampleDequeGen<T>,
+) -> impl Iterator<Item = (ts::SampleDequeGen<T>, Box<dyn Fn(&mut T) -> bool>)>
 where
     T: Clone,
     for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,

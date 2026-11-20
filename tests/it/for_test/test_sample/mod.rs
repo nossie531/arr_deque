@@ -4,6 +4,7 @@ pub(crate) mod deque_vs;
 pub(crate) mod deques;
 pub(crate) mod drains;
 pub(crate) mod iters;
+
 pub(crate) use deque_builder::*;
 pub(crate) use drain_builder::*;
 pub(crate) use funcs::*;
@@ -19,14 +20,23 @@ pub const NORMAL_LEN: usize = (CAPACITY as f32 * NORMAL_RATIO) as usize;
 
 pub type Val = i32;
 pub type Float = f32;
-pub type SampleDeque = ArrDeque<Val, CAPACITY>;
-pub type SampleDequeFloat = ArrDeque<Float, CAPACITY>;
-pub type SampleDequeByte = ArrDeque<u8, CAPACITY>;
 pub type SampleBuilder = DequeBuilder<CAPACITY>;
+pub type SampleDeque = SampleDequeGen<Val>;
+pub type SampleDequeFloat = SampleDequeGen<Float>;
+pub type SampleDequeByte = SampleDequeGen<u8>;
+pub type SampleDequeTraced = SampleDequeGen<TraceValNt<Val>>;
+pub type SampleDequeGen<T> = arr_deque::ArrDeque<T, CAPACITY>;
+pub type SampleIntoIter<T> = arr_deque::IntoIter<T, CAPACITY>;
+pub type SampleIter<'a, T> = arr_deque::Iter<'a, T>;
+pub type SampleIterMut<'a, T> = arr_deque::IterMut<'a, T>;
+pub type MasterDeque = std::collections::vec_deque::VecDeque<Val>;
+pub type MasterDequeGen<T> = std::collections::vec_deque::VecDeque<T>;
+pub type MasterIntoIter<T> = std::collections::vec_deque::IntoIter<T>;
+pub type MasterIter<'a, T> = std::collections::vec_deque::Iter<'a, T>;
+pub type MasterIterMut<'a, T> = std::collections::vec_deque::IterMut<'a, T>;
 
 mod deque_builder;
 mod drain_builder;
 mod funcs;
 mod iter_builder;
 mod trace_val_nt;
-use arr_deque::prelude::*;

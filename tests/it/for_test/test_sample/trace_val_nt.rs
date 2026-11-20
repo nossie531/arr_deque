@@ -1,10 +1,10 @@
-use std::ops::Rem;
+use crate::for_test::*;
 use drop_tracer::prelude::*;
 use rand::distr::StandardUniform;
 use rand::prelude::*;
-use crate::for_test::*;
+use std::ops::Rem;
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct TraceValNt<T>(TraceVal<T>);
 
 impl<T> TraceValNt<T> {
@@ -12,9 +12,8 @@ impl<T> TraceValNt<T> {
         Self(TraceVal::new(value))
     }
 
-    pub fn with_tracer(mut self, tracer: &DropTracer) -> Self {
-        tracer.trace_on(&mut self.0);
-        self
+    pub fn with_bomb(self, bomb: bool) -> Self {
+        Self(TraceVal::with_bomb(self.0, bomb))
     }
 
     pub fn base_mut(&mut self) -> &mut TraceVal<T> {

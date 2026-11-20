@@ -1479,19 +1479,22 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// Clear elements in given range.
     pub(crate) fn clear_elements<R>(&mut self, range: &R)
     where
-        R: RangeBounds<usize>,
+        R: RangeBounds<DeqIdx>,
     {
-        self.drop_elements(range);
-        self.clear_elements_without_drops(range);
+        let drops = &mut util::range_normalize(range, self.len());
+        util::rerun_on_panic(|| {
+            unsafe { self.drop_elements(drops) }
+            self.clear_elements_without_drops(range);
+        });
     }
 
     /// Clear elements in given range without drop call.
     pub(crate) fn clear_elements_without_drops<R>(&mut self, range: &R)
     where
-        R: RangeBounds<usize>,
+        R: RangeBounds<DeqIdx>,
     {
         let rx = &self.all();
-        let ry = &util::range_cap(range, self.len);
+        let ry = &util::range_normalize(range, self.len);
         let target = &util::range_prod(rx, ry);
         let rests = &util::range_diff(rx, ry);
         let slim_dir = Dir::dec(rests[0].len() <= rests[1].len());
@@ -1507,12 +1510,14 @@ impl<T, const N: usize> ArrDeque<T, N> {
         self.start = util::add_mod(self.start, start_offset, N);
     }
 
-    /// Drop elements in given range.
-    pub(crate) fn drop_elements<R>(&mut self, range: &R)
-    where
-        R: RangeBounds<usize>,
-    {
-        for i in util::range_cap(range, self.len) {
+    /// Drops elements in given range.
+    ///
+    /// # Safety
+    ///
+    /// This method drops the elements manually.
+    /// So be careful double drops or none initialized drop.
+    pub(crate) unsafe fn drop_elements(&mut self, range: &mut Range<DeqIdx>) {
+        while let Some(i) = range.next() {
             unsafe { self.buf_drop_at(self.to_buf_idx(i)) };
         }
     }
@@ -1521,7 +1526,8 @@ impl<T, const N: usize> ArrDeque<T, N> {
     ///
     /// # Safety
     ///
-    /// These methods copy value. So be careful about aliasing rules.
+    /// This method copies target value.
+    /// So be careful about aliasing rules.
     pub(crate) unsafe fn copy_val(&self, index: DeqIdx) -> T {
         unsafe { self.buf_copy_at(self.to_buf_idx(index)) }
     }
@@ -1731,7 +1737,8 @@ impl<T, const N: usize> Default for ArrDeque<T, N> {
 
 impl<T, const N: usize> Drop for ArrDeque<T, N> {
     fn drop(&mut self) {
-        self.drop_elements(&..);
+        let all = &mut util::range_normalize(&.., self.len);
+        unsafe { self.drop_elements(all) }
     }
 }
 

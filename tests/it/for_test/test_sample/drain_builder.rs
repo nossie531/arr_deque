@@ -1,14 +1,12 @@
 use crate::for_test::*;
 use arr_deque::*;
-use drop_tracer::DropTracer;
-use std::collections::VecDeque;
 use std::collections::vec_deque::Drain as Master;
 use std::ops::Range;
 
 #[derive(Clone)]
 pub struct DrainBuilder<T> {
-    arr_deque: Option<ArrDeque<T, { ts::CAPACITY }>>,
-    vec_deque: Option<VecDeque<T>>,
+    arr_deque: Option<ts::SampleDequeGen<T>>,
+    vec_deque: Option<ts::MasterDequeGen<T>>,
     range: Option<Range<usize>>,
     head_skip: usize,
     tail_skip: usize,
@@ -25,11 +23,11 @@ impl<T> DrainBuilder<T> {
         }
     }
 
-    pub fn with_deque(self, value: ArrDeque<T, { ts::CAPACITY }>) -> Self
+    pub fn with_deque(self, value: ts::SampleDequeGen<T>) -> Self
     where
         T: Clone,
     {
-        let vec_deque = VecDeque::from_iter(value.iter().cloned());
+        let vec_deque = ts::MasterDequeGen::from_iter(value.iter().cloned());
         Self {
             arr_deque: Some(value),
             vec_deque: Some(vec_deque),
@@ -58,8 +56,20 @@ impl<T> DrainBuilder<T> {
         }
     }
 
-    pub fn deque(&self) -> &ArrDeque<T, { ts::CAPACITY }> {
+    pub fn target_deque(&self) -> &ts::SampleDequeGen<T> {
         self.arr_deque.as_ref().unwrap()
+    }
+
+    pub fn target_deque_mut(&mut self) -> &mut ts::SampleDequeGen<T> {
+        self.arr_deque.as_mut().unwrap()
+    }
+
+    pub fn master_deque(&self) -> &ts::MasterDequeGen<T> {
+        self.vec_deque.as_ref().unwrap()
+    }
+
+    pub fn master_deque_mut(&mut self) -> &mut ts::MasterDequeGen<T> {
+        self.vec_deque.as_mut().unwrap()
     }
 
     pub fn range(&self) -> &Range<usize> {
@@ -81,19 +91,14 @@ impl<T> DrainBuilder<T> {
     }
 }
 
-impl DrainBuilder<ts::TraceValNt<()>> {
-    pub fn build_traced_target(
-        &mut self,
-        tracer: &DropTracer,
-    ) -> Drain<'_, ts::TraceValNt<()>, { ts::CAPACITY }> {
-        let deque = self.arr_deque.as_mut().unwrap();
-        for item in deque.iter_mut() {
-            tracer.trace_on(item.base_mut());
-        }
-
-        let range = self.range.as_ref().unwrap().clone();
-        let result = deque.drain(range.clone());
-        tu::skip_iter(result, self.head_skip, self.tail_skip)
+impl DrainBuilder<ts::TraceValNt<ts::Val>> {
+    pub fn new_bomb() -> Self {
+        let mut bomb_deque = ts::deque::normal_traced();
+        let bomb_index = bomb_deque.len() / 2;
+        let bomb_value = ts::TraceValNt::new(ts::VAL).with_bomb(true);
+        let range = bomb_index-1..bomb_index+1;
+        bomb_deque.insert(bomb_index, bomb_value);
+        Self::new().with_deque(bomb_deque).with_range(range)
     }
 }
 

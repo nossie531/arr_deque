@@ -1,4 +1,5 @@
 use rand::distr::{Distribution, StandardUniform};
+use std::iter;
 
 use crate::for_test::*;
 
@@ -18,11 +19,15 @@ where
         .flat_map(each_skips)
 }
 
+pub fn all_with_bomb() -> impl Iterator<Item = ts::DrainBuilder<ts::TraceValNt<ts::Val>>> {
+    all_of().chain(iter::once_with(ts::DrainBuilder::new_bomb))
+}
+
 fn each_ranges<T>(builder: ts::DrainBuilder<T>) -> impl Iterator<Item = ts::DrainBuilder<T>>
 where
     T: Clone,
 {
-    let ranges = ts::ranges_inside(builder.deque().len());
+    let ranges = ts::ranges_inside(builder.target_deque().len());
     ranges.map(move |x| builder.clone().with_range(x))
 }
 

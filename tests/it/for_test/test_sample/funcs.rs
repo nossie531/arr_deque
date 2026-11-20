@@ -56,7 +56,8 @@ pub fn ranges_outside(len: usize) -> impl Iterator<Item = Range<usize>> {
 
 pub fn predicates<T>() -> impl Iterator<Item = Box<dyn Fn(&T) -> bool>>
 where
-    for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>, {
+    for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
+{
     {
         let arr: [Box<dyn Fn(&T) -> bool>; _] = [
             Box::new(|_| true),

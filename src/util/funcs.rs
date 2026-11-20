@@ -5,6 +5,7 @@ use crate::*;
 use core::ops::RangeTo;
 use core::ops::{Bound, Range, RangeBounds};
 use rich_range::prelude::*;
+use std::mem::DropGuard;
 
 /// Returns offset value modulared by `m`.
 pub(crate) fn offset_mod(value: usize, offset: Offset, m: usize) -> usize {
@@ -54,12 +55,12 @@ pub(crate) fn range_diff(rx: &Range<usize>, ry: &Range<usize>) -> [Range<usize>;
     [ret1, ret2]
 }
 
-/// Returns capped range.
-pub(crate) fn range_cap<R>(range: &R, len: usize) -> Range<usize>
+/// Returns normalized range.
+pub(crate) fn range_normalize<R>(range: &R, len: usize) -> Range<usize>
 where
     R: RangeBounds<usize>,
 {
-    let range = range_cap_raw(range, len);
+    let range = range_normalize_raw(range, len);
     range.start.min(range.end)..range.end
 }
 
@@ -80,7 +81,7 @@ pub(crate) fn range_slice<R>(range: R, bounds: RangeTo<usize>) -> Range<usize>
 where
     R: RangeBounds<usize>,
 {
-    let range = range_cap_raw(&range, bounds.end);
+    let range = range_normalize_raw(&range, bounds.end);
     if range.start > range.end {
         panic!(msg::range_order_rev!(), range.start, range.end);
     } else if range.end > bounds.end {
@@ -121,8 +122,26 @@ where
         .or_else(|| iters[0].nth_back(n - fst_part))
 }
 
-/// Returns raw capped range.
-fn range_cap_raw<R>(range: &R, len: usize) -> Range<usize>
+/// Invokes a closure and rerun if it is panicked.
+pub(crate) fn rerun_on_panic<F>(mut f: F)
+where
+    F: FnMut(),
+{
+    let mut done = false;
+    DropGuard::new(
+        || {
+            if done {
+                return;
+            }
+            f();
+            done = true;
+        },
+        |mut x| x(),
+    )();
+}
+
+/// Returns raw normalized range.
+fn range_normalize_raw<R>(range: &R, len: usize) -> Range<usize>
 where
     R: RangeBounds<usize>,
 {

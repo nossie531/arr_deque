@@ -316,7 +316,7 @@ fn binary_search_by_key() {
 
 #[test]
 fn clear() {
-    for ref mut target in ts::deques::all_of() {
+    for ref mut target in ts::deques::all_with_bomb() {
         // Arrange.
         let master = &mut ch::master(&target);
         let target_tracer = &DropTracer::new();
@@ -326,9 +326,10 @@ fn clear() {
         tu::trace_all(target.iter_mut(), target_tracer);
         tu::trace_all(master.iter_mut(), master_tracer);
         // Act.
-        target.clear();
-        master.clear();
+        let asis = test_panic(|| target.clear());
+        let tobe = test_panic(|| master.clear());
         // Assert.
+        assert_eq!(asis, tobe);
         assert!(target.iter().eq(master.iter()));
         assert!(tu::eq_logs(
             &target_tracer,
@@ -341,133 +342,133 @@ fn clear() {
 
 #[test]
 fn pop_front() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        for ref mut target in ts::deques::all() {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = target.pop_front();
-            let tobe = master.pop_front();
-            // Assert.
-            assert_eq!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    for ref mut target in ts::deques::all_of() {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        target.push_front(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.pop_front();
-        // Assert.
-        assert_eq!(tracer.living_count(), 1);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 0);
+        let asis = target.pop_front();
+        let tobe = master.pop_front();
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
 #[test]
 fn pop_back() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        for ref mut target in ts::deques::all() {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = target.pop_back();
-            let tobe = master.pop_back();
-            // Assert.
-            assert_eq!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    for ref mut target in ts::deques::all_of() {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        target.push_back(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.pop_back();
-        // Assert.
-        assert_eq!(tracer.living_count(), 1);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 0);
+        let tobe = master.pop_back();
+        let asis = target.pop_back();
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
 #[test]
 fn pop_front_if() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        let targets = ts::deques::all_for_binary_search();
-        let patterns = ts::deque_vs::each_predicates_mut;
-        for (ref mut target, predicate) in targets.flat_map(patterns) {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = target.pop_front_if(|x| predicate(x));
-            let tobe = master.pop_front_if(|x| predicate(x));
-            // Assert.
-            assert_eq!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_predicates_mut;
+    for (ref mut target, predicate) in targets.flat_map(patterns) {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        target.push_front(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.pop_front_if(|_| true);
-        // Assert.
-        assert_eq!(tracer.living_count(), 1);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 0);
+        let asis = target.pop_front_if(|x| predicate(x));
+        let tobe = master.pop_front_if(|x| predicate(x));
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
 #[test]
 fn pop_back_if() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        let targets = ts::deques::all_for_binary_search();
-        let patterns = ts::deque_vs::each_predicates_mut;
-        for (ref mut target, predicate) in targets.flat_map(patterns) {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = target.pop_back_if(|x| predicate(x));
-            let tobe = master.pop_back_if(|x| predicate(x));
-            // Assert.
-            assert_eq!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_predicates_mut;
+    for (ref mut target, predicate) in targets.flat_map(patterns) {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        target.push_back(ts::TraceValNt::new(ts::VAL).with_tracer(tracer));
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.pop_back_if(|_| true);
-        // Assert.
-        assert_eq!(tracer.living_count(), 1);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 0);
+        let asis = target.pop_back_if(|x| predicate(x));
+        let tobe = master.pop_back_if(|x| predicate(x));
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
@@ -583,36 +584,35 @@ fn push_back_mut() {
 
 #[test]
 fn remove() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        let targets = ts::deques::none_emptys();
-        let patterns = ts::deque_vs::each_indicies;
-        for (ref mut target, index) in targets.flat_map(patterns) {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = test_panic(|| target.remove(index));
-            let tobe = test_panic(|| master.remove(index));
-            // Assert.
-            assert_eqn!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_indicies;
+    for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        let index = target.len() / 2;
-        tracer.trace_on(target.get_mut(index).unwrap().base_mut());
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.remove(index);
-        // Assert.
-        assert_eq!(tracer.living_count(), 1);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 0);
+        let tobe = master.remove(index);
+        let asis = target.remove(index);
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
@@ -664,73 +664,69 @@ fn swap() {
 
 #[test]
 fn swap_remove_front() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        let targets = ts::deques::looses();
-        let patterns = ts::deque_vs::each_indicies;
-        for (ref mut target, index) in targets.flat_map(patterns) {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = target.swap_remove_front(index);
-            let tobe = master.swap_remove_front(index);
-            // Assert.
-            assert_eq!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_indicies;
+    for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        let index = target.len() / 2;
-        tracer.trace_on(target[0].base_mut());
-        tracer.trace_on(target[index].base_mut());
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.swap_remove_front(index);
-        // Assert.
-        assert_eq!(tracer.living_count(), 2);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 1);
+        let asis = target.swap_remove_front(index);
+        let tobe = master.swap_remove_front(index);
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
 #[test]
 fn swap_remove_back() {
-    when_normal();
-    test_drop();
-
-    fn when_normal() {
-        let targets = ts::deques::looses();
-        let patterns = ts::deque_vs::each_indicies;
-        for (ref mut target, index) in targets.flat_map(patterns) {
-            // Arrange.
-            let master = &mut ch::master(&target);
-            // Act.
-            let asis = target.swap_remove_back(index);
-            let tobe = master.swap_remove_back(index);
-            // Assert.
-            assert_eq!(asis, tobe);
-            assert!(target.iter().eq(master.iter()));
-        }
-    }
-
-    fn test_drop() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_indicies;
+    for (ref mut target, index) in targets.flat_map(patterns) {
         // Arrange.
-        let tracer = &DropTracer::new();
-        let target = &mut ts::deque::normal_tracable();
-        let index = target.len() / 2;
-        tracer.trace_on(target[0].base_mut());
-        tracer.trace_on(target[index].base_mut());
+        let master = &mut ch::master(&target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+
         // Act.
-        let result = target.swap_remove_back(index);
-        // Assert.
-        assert_eq!(tracer.living_count(), 2);
-        mem::drop(result);
-        assert_eq!(tracer.living_count(), 1);
+        let asis = target.swap_remove_back(index);
+        let tobe = master.swap_remove_back(index);
+
+        // Assert result.
+        assert_eq!(asis, tobe);
+        assert!(target.iter().eq(master.iter()));
+        assert_eq!(target_tracer.living_count(), master_tracer.living_count());
+
+        // Assert return value dropping.
+        mem::drop((asis, tobe));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }
 
@@ -849,19 +845,20 @@ fn resize() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all_of();
+        let targets = ts::deques::all_with_bomb();
         let patterns = ts::deque_vs::each_indicies_more;
-        for (ref mut target, len) in targets.flat_map(patterns) {
+        for (mut target, len) in targets.flat_map(patterns) {
             // Arrange.
-            let master = &mut ch::master(target);
+            let mut master = ch::master(&target);
             let target_tracer = &DropTracer::new();
             let master_tracer = &DropTracer::new();
             let target_tags = tu::tag_map(target.iter());
             let master_tags = tu::tag_map(master.iter());
             // Act.
-            target.resize(len, ts::TraceValNt::new(ts::VAL));
-            master.resize(len, ts::TraceValNt::new(ts::VAL));
+            let asis = test_panic(|| target.resize(len, ts::TraceValNt::new(ts::VAL)));
+            let tobe = test_panic(|| master.resize(len, ts::TraceValNt::new(ts::VAL)));
             // Assert.
+            assert_eq!(asis, tobe);
             assert!(target.iter().eq(master.iter()));
             assert!(tu::eq_logs(
                 &target_tracer,
@@ -886,7 +883,7 @@ fn resize_with() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all_of();
+        let targets = ts::deques::all_with_bomb();
         let patterns = ts::deque_vs::each_indicies_more;
         for (ref mut target, len) in targets.flat_map(patterns) {
             // Arrange.
@@ -896,9 +893,10 @@ fn resize_with() {
             let target_tags = tu::tag_map(target.iter());
             let master_tags = tu::tag_map(master.iter());
             // Act.
-            target.resize_with(len, || ts::TraceValNt::new(ts::VAL));
-            master.resize_with(len, || ts::TraceValNt::new(ts::VAL));
+            let asis = test_panic(|| target.resize_with(len, || ts::TraceValNt::new(ts::VAL)));
+            let tobe = test_panic(|| master.resize_with(len, || ts::TraceValNt::new(ts::VAL)));
             // Assert.
+            assert_eq!(asis, tobe);
             assert!(target.iter().eq(master.iter()));
             assert!(tu::eq_logs(
                 &target_tracer,
@@ -918,8 +916,8 @@ fn resize_with() {
 }
 
 #[test]
-fn retain() {
-    let targets = ts::deques::all_of();
+fn retain_xxx() {
+    let targets = ts::deques::all_with_bomb();
     let patterns = ts::deque_vs::each_predicates;
     for (ref mut target, f) in targets.flat_map(patterns) {
         // Arrange.
@@ -929,9 +927,10 @@ fn retain() {
         let target_tags = tu::tag_map(target.iter());
         let master_tags = tu::tag_map(master.iter());
         // Act.
-        target.retain(|x| f(x));
-        master.retain(|x| f(x));
+        let asis = test_panic(|| target.retain(|x| f(x)));
+        let tobe = test_panic(|| master.retain(|x| f(x)));
         // Assert.
+        assert_eq!(asis, tobe);
         assert!(target.iter().eq(master.iter()));
         assert!(tu::eq_logs(
             &target_tracer,

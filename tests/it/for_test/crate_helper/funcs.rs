@@ -1,9 +1,8 @@
-use arr_deque::prelude::*;
-use std::collections::VecDeque;
+use crate::for_test::*;
 
-pub fn master<T, const N: usize>(target: &ArrDeque<T, N>) -> VecDeque<T>
+pub fn master<T>(target: &ts::SampleDequeGen<T>) -> ts::MasterDequeGen<T>
 where
     T: Clone,
 {
-    VecDeque::from_iter(target.iter().cloned())
+    ts::MasterDequeGen::from_iter(target.iter().cloned())
 }

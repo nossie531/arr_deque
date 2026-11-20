@@ -17,7 +17,7 @@ subject = "0.2"
 rand = "0.10"
 rand_pcg = "0.10"
 test_panic = "0.9"
-drop_tracer = "0.6"
+drop_tracer = { path = "../drop_tracer" }
 
 [features]
 default = ["std"]

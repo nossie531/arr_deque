@@ -1,6 +1,7 @@
 use crate::for_test::*;
 use drop_tracer::DropTracer;
 use std::mem;
+use test_panic::prelude::*;
 
 #[test]
 fn fmt() {
@@ -58,16 +59,36 @@ fn size_hint() {
 
 #[test]
 fn drop() {
-    for ref mut builder in ts::drains::all_of::<ts::TraceValNt<()>>() {
-        // Arrange.
-        let tracer = DropTracer::new();
-        let numof_remains = builder.deque().len() - builder.range().len();
-        let mut target = builder.build_traced_target(&tracer);
-        target.next();
-        target.next_back();
+    for builder in ts::drains::all_with_bomb() {
+        // Arrange enviroments.
+        let mut builder = tu::dup(builder);
+        let target_deque = builder.0.target_deque_mut();
+        let master_deque = builder.1.master_deque_mut();
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target_deque.iter());
+        let master_tags = tu::tag_map(master_deque.iter());
+        tu::trace_all(target_deque.iter_mut(), target_tracer);
+        tu::trace_all(master_deque.iter_mut(), master_tracer);
+
+        // Arrange target.
+        let target = builder.0.build_target();
+        let master = builder.1.build_master();
+
         // Act.
-        mem::drop(target);
+        let asis = test_panic(|| mem::drop(target));
+        let tobe = test_panic(|| mem::drop(master));
+
         // Assert.
-        assert_eq!(tracer.living_count(), numof_remains);
+        let target_deque = builder.0.target_deque();
+        let master_deque = builder.1.master_deque();
+        assert_eq!(asis, tobe);
+        assert!(target_deque.iter().eq(master_deque.iter()));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
     }
 }

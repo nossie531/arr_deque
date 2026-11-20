@@ -36,8 +36,11 @@ impl<'a, T: 'a, const N: usize> Drain<'a, T, N> {
 
 impl<T, const N: usize> Drop for Drain<'_, T, N> {
     fn drop(&mut self) {
-        self.target.drop_elements(&self.curr);
-        self.target.clear_elements_without_drops(&self.range);
+        let drops = &mut util::range_normalize(&self.curr, self.target.len());
+        util::rerun_on_panic(|| {
+            unsafe { self.target.drop_elements(drops) }
+            self.target.clear_elements_without_drops(&self.range);
+        });
     }
 }
 
