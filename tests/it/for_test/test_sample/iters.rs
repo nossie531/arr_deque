@@ -1,9 +1,9 @@
 use crate::for_test::*;
 
 pub fn all() -> impl Iterator<Item = ts::IterBuilder> {
-    let default = ts::IterBuilder::default();
+    let default = ts::IterBuilder::new();
     let all_deque_vs_skip = ts::deques::all()
-        .map(|x| ts::IterBuilder::default().with_deque(x))
+        .map(|x| ts::IterBuilder::new().with_deque(x))
         .flat_map(each_skips);
     [default].into_iter().chain(all_deque_vs_skip)
 }

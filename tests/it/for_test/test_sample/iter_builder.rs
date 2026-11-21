@@ -1,20 +1,28 @@
 use crate::for_test::*;
-use arr_deque::*;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct IterBuilder {
-    arr_deque: Option<ts::SampleDeque>,
-    vec_deque: Option<ts::MasterDeque>,
+    arr_deque: ts::SampleDeque,
+    vec_deque: ts::MasterDeque,
     head_skip: usize,
     tail_skip: usize,
 }
 
 impl IterBuilder {
-    pub fn with_deque(self, value: ts::SampleDeque) -> Self {
-        let vec_deque = ts::MasterDeque::from_iter(value.iter().cloned());
+    pub fn new() -> Self {
         Self {
-            arr_deque: Some(value),
-            vec_deque: Some(vec_deque),
+            arr_deque: ts::SampleDeque::default(),
+            vec_deque: ts::MasterDeque::default(),
+            head_skip: 0,
+            tail_skip: 0,
+        }
+    }
+
+    pub fn with_deque(self, arr_deque: ts::SampleDeque) -> Self {
+        let vec_deque = ts::MasterDeque::from_iter(arr_deque.iter().cloned());
+        Self {
+            arr_deque,
+            vec_deque,
             ..self
         }
     }
@@ -34,7 +42,7 @@ impl IterBuilder {
     }
 
     pub fn deque(&self) -> &ts::SampleDeque {
-        self.arr_deque.as_ref().unwrap()
+        &self.arr_deque
     }
 
     pub fn head_skip(&self) -> usize {
@@ -45,74 +53,39 @@ impl IterBuilder {
         self.tail_skip
     }
 
-    pub fn each_index(self) -> impl Iterator<Item = (Self, usize)> {
-        let skiped = self.head_skip + self.tail_skip;
-        let len = self.arr_deque.as_ref().map_or(0, ArrDeque::len) - skiped;
-        let indicies = ts::indicies(len);
-        indicies.map(move |x| (self.clone(), x))
-    }
-
-    pub fn build_iter(&self) -> ts::SampleIter<'_, ts::Val> {
-        if self.is_empty() {
-            return ts::SampleIter::default();
-        }
-
-        let deque = self.arr_deque.as_ref().unwrap();
+    pub fn build_target_iter(&self) -> ts::SampleIter<'_, ts::Val> {
+        let deque = &self.arr_deque;
         let result = deque.iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
-    pub fn build_into_iter(&self) -> ts::SampleIntoIter<ts::Val> {
-        if self.is_empty() {
-            return ArrDeque::new().into_iter();
-        }
-
-        let deque = self.arr_deque.as_ref().unwrap().clone();
+    pub fn build_target_into_iter(&self) -> ts::SampleIntoIter<ts::Val> {
+        let deque = self.arr_deque.clone();
         let result = deque.into_iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_master_iter(&self) -> ts::MasterIter<'_, ts::Val> {
-        if self.is_empty() {
-            return ts::MasterIter::default();
-        }
-
-        let deque = self.vec_deque.as_ref().unwrap();
+        let deque = &self.vec_deque;
         let result = deque.iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_master_into_iter(&self) -> ts::MasterIntoIter<ts::Val> {
-        if self.is_empty() {
-            return ts::MasterDeque::new().into_iter();
-        }
-
-        let deque = self.vec_deque.as_ref().unwrap().clone();
+        let deque = self.vec_deque.clone();
         let result = deque.into_iter();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
-    pub fn build_iter_mut(&mut self) -> ts::SampleIterMut<'_, ts::Val> {
-        if self.is_empty() {
-            return ts::SampleIterMut::default();
-        }
-
-        let deque = self.arr_deque.as_mut().unwrap();
+    pub fn build_target_iter_mut(&mut self) -> ts::SampleIterMut<'_, ts::Val> {
+        let deque = &mut self.arr_deque;
         let result = deque.iter_mut();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
     pub fn build_master_iter_mut(&mut self) -> ts::MasterIterMut<'_, ts::Val> {
-        if self.is_empty() {
-            return ts::MasterIterMut::default();
-        }
-
-        let deque = self.vec_deque.as_mut().unwrap();
+        let deque = &mut self.vec_deque;
         let result = deque.iter_mut();
         tu::skip_iter(result, self.head_skip, self.tail_skip)
-    }
-
-    fn is_empty(&self) -> bool {
-        self.arr_deque.is_none()
     }
 }

@@ -3,6 +3,7 @@ pub(crate) mod deque_pairs;
 pub(crate) mod deque_vs;
 pub(crate) mod deques;
 pub(crate) mod drains;
+pub(crate) mod iter_vs;
 pub(crate) mod iters;
 
 pub(crate) use deque_builder::*;
@@ -11,6 +12,7 @@ pub(crate) use funcs::*;
 pub(crate) use iter_builder::*;
 pub(crate) use trace_val_nt::*;
 
+pub const ANY_KEY: i32 = 42;
 pub const VAL: Val = 42;
 pub const QUANT_SIZE: Val = 10;
 pub const UNQUANT_SIZE: Val = QUANT_SIZE - 1;

@@ -1,8 +1,6 @@
 use crate::for_test::*;
 use std::ops::{Range, Rem};
 
-const ANY_KEY: i32 = 42;
-
 pub fn each_ring_starts(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::SampleDeque, usize)> {
     ch::RingBufAlign::all().map(move |x| {
         let n = x.calc_ring_start(deque.len(), deque.capacity());
@@ -74,7 +72,7 @@ pub fn each_contains_keys(
         .collect::<Vec<_>>();
 
     let keys_unmatched = if deque.len() == 0 {
-        vec![ANY_KEY]
+        vec![ts::ANY_KEY]
     } else {
         let any_index = keys_matched.len() / 2;
         let key = keys_matched[any_index] + ts::UNQUANT_SIZE;
@@ -93,7 +91,7 @@ pub fn each_search_keys(
         .collect::<Vec<_>>();
 
     let keys_unmatched = if deque.len() == 0 {
-        vec![ANY_KEY]
+        vec![ts::ANY_KEY]
     } else {
         let min_index = 0;
         let max_index = keys_matched.len() - 1;

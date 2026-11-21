@@ -2,10 +2,9 @@
 
 use crate::util::*;
 use crate::*;
-use core::ops::RangeTo;
-use core::ops::{Bound, Range, RangeBounds};
+use core::mem::DropGuard;
+use core::ops::{Bound, Range, RangeBounds, RangeTo};
 use rich_range::prelude::*;
-use std::mem::DropGuard;
 
 /// Returns offset value modulared by `m`.
 pub(crate) fn offset_mod(value: usize, offset: Offset, m: usize) -> usize {
@@ -130,11 +129,10 @@ where
     let mut done = false;
     DropGuard::new(
         || {
-            if done {
-                return;
+            if !done {
+                f();
+                done = true;
             }
-            f();
-            done = true;
         },
         |mut x| x(),
     )();

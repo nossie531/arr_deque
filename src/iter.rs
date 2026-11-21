@@ -39,8 +39,8 @@ where
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Iter")
-            .field(&self.part1)
-            .field(&self.part2)
+            .field(&self.part1.as_slice())
+            .field(&self.part2.as_slice())
             .finish()
     }
 }

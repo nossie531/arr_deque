@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `IterMut::fmt` (wrong contents)
+- `Iter::fmt`
+- `IterMut::fmt`
 - `IntoIterator::nth`
 - `IntoIterator::nth_back`
 - Panic handling at element drop.

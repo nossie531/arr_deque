@@ -3,8 +3,8 @@ use arr_deque::*;
 
 #[test]
 fn fmt() {
-    for mut builder in ts::iters::all() {
-        let target = builder.build_iter_mut();
+    for ref mut builder in ts::iters::all() {
+        let target = builder.build_target_iter_mut();
         let result = format!("{:?}", target);
         assert!(!result.is_empty());
     }
@@ -21,7 +21,7 @@ fn next() {
     for builder in ts::iters::all() {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = &mut builder.0.build_iter_mut();
+        let target = &mut builder.0.build_target_iter_mut();
         let master = &mut builder.1.build_master_iter_mut();
 
         // Act.
@@ -30,6 +30,7 @@ fn next() {
 
         // Assert value.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
 
         // Assert reference position.
         if let Some(asis) = asis {
@@ -42,10 +43,11 @@ fn next() {
 
 #[test]
 fn nth() {
-    for (builder, n) in ts::iters::all().flat_map(ts::IterBuilder::each_index) {
+    let builders = ts::iters::all();
+    for (builder, n) in builders.flat_map(ts::iter_vs::each_index) {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = &mut builder.0.build_iter_mut();
+        let target = &mut builder.0.build_target_iter_mut();
         let master = &mut builder.1.build_master_iter_mut();
 
         // Act.
@@ -54,6 +56,7 @@ fn nth() {
 
         // Assert value.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
 
         // Assert reference position.
         if let Some(asis) = asis {
@@ -69,8 +72,8 @@ fn size_hint() {
     for builder in ts::iters::all() {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = &mut builder.0.build_iter_mut();
-        let master = &mut builder.1.build_master_iter_mut();
+        let target = &builder.0.build_target_iter_mut();
+        let master = &builder.1.build_master_iter_mut();
 
         // Act.
         let asis = target.size_hint();
@@ -86,7 +89,7 @@ fn count() {
     for builder in ts::iters::all() {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = builder.0.build_iter_mut();
+        let target = builder.0.build_target_iter_mut();
         let master = builder.1.build_master_iter_mut();
         // Act.
         let asis = target.count();
@@ -101,7 +104,7 @@ fn last() {
     for builder in ts::iters::all() {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = builder.0.build_iter_mut();
+        let target = builder.0.build_target_iter_mut();
         let master = builder.1.build_master_iter_mut();
 
         // Act.
@@ -125,7 +128,7 @@ fn next_back() {
     for builder in ts::iters::all() {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = &mut builder.0.build_iter_mut();
+        let target = &mut builder.0.build_target_iter_mut();
         let master = &mut builder.1.build_master_iter_mut();
 
         // Act.
@@ -134,6 +137,7 @@ fn next_back() {
 
         // Assert value.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
 
         // Assert reference position.
         if let Some(asis) = asis {
@@ -146,10 +150,11 @@ fn next_back() {
 
 #[test]
 fn nth_back() {
-    for (builder, n) in ts::iters::all().flat_map(ts::IterBuilder::each_index) {
+    let builders = ts::iters::all();
+    for (builder, n) in builders.flat_map(ts::iter_vs::each_index) {
         // Arrange.
         let mut builder = tu::dup(builder);
-        let target = &mut builder.0.build_iter_mut();
+        let target = &mut builder.0.build_target_iter_mut();
         let master = &mut builder.1.build_master_iter_mut();
 
         // Act.
@@ -158,6 +163,7 @@ fn nth_back() {
 
         // Assert value.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
 
         // Assert reference position.
         if let Some(asis) = asis {

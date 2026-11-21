@@ -3,7 +3,7 @@ use crate::for_test::*;
 #[test]
 fn clone() {
     for builder in ts::iters::all() {
-        let target = builder.build_into_iter();
+        let target = builder.build_target_into_iter();
         let result = target.clone();
         assert!(target.eq(result));
     }
@@ -13,7 +13,7 @@ fn clone() {
 fn fmt() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = builder.build_into_iter();
+        let target = builder.build_target_into_iter();
         let master = builder.build_master_into_iter();
         // Act.
         let asis = format!("{:?}", target);
@@ -27,27 +27,30 @@ fn fmt() {
 fn next() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = &mut builder.build_into_iter();
+        let target = &mut builder.build_target_into_iter();
         let master = &mut builder.build_master_into_iter();
         // Act.
         let asis = target.next();
         let tobe = master.next();
         // Assert.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
     }
 }
 
 #[test]
 fn nth() {
-    for (builder, n) in ts::iters::all().flat_map(ts::IterBuilder::each_index) {
+    let builders = ts::iters::all();
+    for (builder, n) in builders.flat_map(ts::iter_vs::each_index) {
         // Arrange.
-        let target = &mut builder.build_into_iter();
+        let target = &mut builder.build_target_into_iter();
         let master = &mut builder.build_master_into_iter();
         // Act.
         let asis = target.nth(n);
         let tobe = master.nth(n);
         // Assert.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
     }
 }
 
@@ -55,8 +58,8 @@ fn nth() {
 fn size_hint() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = &mut builder.build_into_iter();
-        let master = &mut builder.build_master_into_iter();
+        let target = &builder.build_target_into_iter();
+        let master = &builder.build_master_into_iter();
         // Act.
         let asis = target.size_hint();
         let tobe = master.size_hint();
@@ -69,7 +72,7 @@ fn size_hint() {
 fn count() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = builder.build_into_iter();
+        let target = builder.build_target_into_iter();
         let master = builder.build_master_into_iter();
         // Act.
         let asis = target.count();
@@ -83,7 +86,7 @@ fn count() {
 fn last() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = builder.build_into_iter();
+        let target = builder.build_target_into_iter();
         let master = builder.build_master_into_iter();
         // Act.
         let asis = target.last();
@@ -97,27 +100,30 @@ fn last() {
 fn next_back() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = &mut builder.build_into_iter();
+        let target = &mut builder.build_target_into_iter();
         let master = &mut builder.build_master_into_iter();
         // Act.
         let asis = target.next_back();
         let tobe = master.next_back();
         // Assert.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
     }
 }
 
 #[test]
 fn nth_back() {
-    for (builder, n) in ts::iters::all().flat_map(ts::IterBuilder::each_index) {
+    let builders = ts::iters::all();
+    for (builder, n) in builders.flat_map(ts::iter_vs::each_index) {
         // Arrange.
-        let target = &mut builder.build_into_iter();
+        let target = &mut builder.build_target_into_iter();
         let master = &mut builder.build_master_into_iter();
         // Act.
         let asis = target.nth_back(n);
         let tobe = master.nth_back(n);
         // Assert.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
     }
 }
 
@@ -125,12 +131,13 @@ fn nth_back() {
 fn len() {
     for builder in ts::iters::all() {
         // Arrange.
-        let target = builder.build_into_iter();
+        let target = builder.build_target_into_iter();
         let master = builder.build_master_into_iter();
         // Act.
         let asis = target.len();
         let tobe = master.len();
         // Assert.
         assert_eq!(asis, tobe);
+        assert_eq!(target.size_hint(), master.size_hint());
     }
 }

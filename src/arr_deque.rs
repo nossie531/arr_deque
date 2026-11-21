@@ -2,13 +2,12 @@
 
 use crate::util::*;
 use crate::*;
-use core::array;
 use core::cmp::Ordering;
 use core::fmt::{Debug, Formatter};
 use core::hash::{Hash, Hasher};
 use core::mem::{self, MaybeUninit};
 use core::ops::{Index, IndexMut, Not, Range, RangeBounds};
-use core::ptr;
+use core::{array, ptr};
 use subject::exts::{MapExt, UpgetExt};
 use subject::prelude::*;
 
@@ -16,7 +15,7 @@ use subject::prelude::*;
 use std::io::{self, BufRead, Read, Write};
 
 #[cfg(feature = "alloc")]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(doc)]
 use std::collections::VecDeque;
@@ -80,6 +79,8 @@ use std::collections::VecDeque;
 ///
 ///   - [`as_slices`](Self::as_slices)
 ///   - [`as_mut_slices`](Self::as_mut_slices)
+///   - [`Iter::fmt`]
+///   - [`IterMut::fmt`]
 ///   - [`BufRead`] methods
 ///   - [`Read`] methods
 ///
@@ -1517,7 +1518,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// This method drops the elements manually.
     /// So be careful double drops or none initialized drop.
     pub(crate) unsafe fn drop_elements(&mut self, range: &mut Range<DeqIdx>) {
-        while let Some(i) = range.next() {
+        for i in range.by_ref() {
             unsafe { self.buf_drop_at(self.to_buf_idx(i)) };
         }
     }
