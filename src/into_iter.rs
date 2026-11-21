@@ -54,6 +54,7 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
     #[inline]
     fn nth(&mut self, n: usize) -> Option<Self::Item> {
         if self.inner.len() <= n {
+            self.inner.clear();
             return None;
         };
 
@@ -71,6 +72,7 @@ impl<T, const N: usize> DoubleEndedIterator for IntoIter<T, N> {
     #[inline]
     fn nth_back(&mut self, n: usize) -> Option<Self::Item> {
         if self.inner.len() <= n {
+            self.inner.clear();
             return None;
         };
 
