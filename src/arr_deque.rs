@@ -178,7 +178,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     /// let buf: ArrDeque<i32, 10> = ArrDeque::new();
     /// assert!(buf.capacity() == 10);
     /// ```
-    pub fn capacity(&self) -> usize {
+    pub const fn capacity(&self) -> usize {
         N
     }
 

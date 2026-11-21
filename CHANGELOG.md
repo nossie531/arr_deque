@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No items.
+### Added
+
+- `ArrDeque::capacity` with `const`
 
 ## [0.5.0] - 2026-11-22
 
