@@ -766,7 +766,7 @@ fn rotate_right() {
 fn truncate() {
     let targets = ts::deques::all_of();
     let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    for (ref mut target, len) in targets.flat_map(patterns) {
         // Arrange.
         let master = &mut ch::master(target);
         let target_tracer = &DropTracer::new();
@@ -776,8 +776,35 @@ fn truncate() {
         tu::trace_all(target.iter_mut(), target_tracer);
         tu::trace_all(master.iter_mut(), master_tracer);
         // Act.
-        target.truncate(index);
-        master.truncate(index);
+        target.truncate(len);
+        master.truncate(len);
+        // Assert.
+        assert!(target.iter().eq(master.iter()));
+        assert!(tu::eq_logs(
+            &target_tracer,
+            &master_tracer,
+            &target_tags,
+            &master_tags
+        ));
+    }
+}
+
+#[test]
+fn retain_back() {
+    let targets = ts::deques::all_of();
+    let patterns = ts::deque_vs::each_indicies;
+    for (ref mut target, len) in targets.flat_map(patterns) {
+        // Arrange.
+        let master = &mut ch::master(target);
+        let target_tracer = &DropTracer::new();
+        let master_tracer = &DropTracer::new();
+        let target_tags = tu::tag_map(target.iter());
+        let master_tags = tu::tag_map(master.iter());
+        tu::trace_all(target.iter_mut(), target_tracer);
+        tu::trace_all(master.iter_mut(), master_tracer);
+        // Act.
+        target.retain_back(len);
+        master.retain_back(len);
         // Assert.
         assert!(target.iter().eq(master.iter()));
         assert!(tu::eq_logs(

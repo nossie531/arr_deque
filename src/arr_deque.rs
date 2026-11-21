@@ -1127,6 +1127,28 @@ impl<T, const N: usize> ArrDeque<T, N> {
         self.clear_elements(&(len..));
     }
 
+    /// Shortens the deque, keeping the last `len` elements and dropping the rest.
+    ///
+    /// See [`VecDeque::retain_back`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use arr_deque::prelude::*;
+    ///
+    /// let mut buf = ArrDeque::<_, 30>::new();
+    /// buf.push_front(5);
+    /// buf.push_front(10);
+    /// buf.push_front(15);
+    /// assert_eq!(buf, [15, 10, 5]);
+    /// assert_eq!(buf.as_slices(), (&[15, 10, 5][..], &[][..]));
+    /// buf.retain_back(1);
+    /// assert_eq!(buf.as_slices(), (&[5][..], &[][..]));
+    /// ```
+    pub fn retain_back(&mut self, len: usize) {
+        self.clear_elements(&(..self.len().saturating_sub(len)));
+    }
+
     /// Splits the deque into two at the given index.
     ///
     /// See [`VecDeque::split_off`].
