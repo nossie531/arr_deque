@@ -12,9 +12,14 @@ fn clone() {
 #[test]
 fn fmt() {
     for builder in ts::iters::all() {
+        // Arrange.
         let target = builder.build_into_iter();
-        let result = format!("{:?}", target);
-        assert!(!result.is_empty());
+        let master = builder.build_master_into_iter();
+        // Act.
+        let asis = format!("{:?}", target);
+        let tobe = format!("{:?}", master);
+        // Assert.
+        assert_eq!(asis, tobe);
     }
 }
 
