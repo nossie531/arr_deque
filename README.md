@@ -7,8 +7,8 @@ _Forgive me if the document is hard to read._
 
 ## What is this?
 
-Core item of this crate is [`ArrDeque`].
-This type is similar to [`VecDeque`].
+Core item of this crate is [`ArrDeque`].\
+This item is similar to [`VecDeque`] in [`std`].\
 But this type uses array instead of vector for internal ring buffer.
 
 ## Other options
@@ -34,5 +34,6 @@ This crate focuses on the following.
 See [CHANGELOG](CHANGELOG.md).
 
 <!-- links -->
-[`ArrDeque`]: https://docs.rs/arr_deque/0.1.2/arr_deque/struct.ArrDeque.html
+[`std`]: https://doc.rust-lang.org/std/
 [`VecDeque`]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
+[`ArrDeque`]: https://docs.rs/arr_deque/0.5.0/arr_deque/struct.ArrDeque.html

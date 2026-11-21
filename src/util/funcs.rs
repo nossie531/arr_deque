@@ -1,8 +1,9 @@
 //! Utility functions.
 
+pub use rerun_on_panic::rerun_on_panic;
+
 use crate::util::*;
 use crate::*;
-use core::mem::DropGuard;
 use core::ops::{Bound, Range, RangeBounds, RangeTo};
 use rich_range::prelude::*;
 
@@ -119,23 +120,6 @@ where
     iters[1]
         .nth_back(fst_part)
         .or_else(|| iters[0].nth_back(n - fst_part))
-}
-
-/// Invokes a closure and rerun if it is panicked.
-pub(crate) fn rerun_on_panic<F>(mut f: F)
-where
-    F: FnMut(),
-{
-    let mut done = false;
-    DropGuard::new(
-        || {
-            if !done {
-                f();
-                done = true;
-            }
-        },
-        |mut x| x(),
-    )();
 }
 
 /// Returns raw normalized range.

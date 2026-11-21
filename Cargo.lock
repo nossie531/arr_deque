@@ -9,6 +9,7 @@ dependencies = [
  "drop_tracer",
  "rand",
  "rand_pcg",
+ "rerun_on_panic",
  "rich_range",
  "subject",
  "test_panic",
@@ -48,7 +49,9 @@ dependencies = [
 
 [[package]]
 name = "drop_tracer"
-version = "0.6.1"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3dc07641094b02ae0989313b234b4626846eec22b31909605f9c3c100cd810b9"
 dependencies = [
  "parking_lot",
 ]
@@ -142,6 +145,12 @@ checksum = "580c875845b41ecb1564ad1ae4703044cef774145e3d7a94dc2b3fa7c97868fd"
 dependencies = [
  "bitflags",
 ]
+
+[[package]]
+name = "rerun_on_panic"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30f305bd6c9c211bdad91e842cb9a97cbd333a595331c5d2776406efedb0d121"
 
 [[package]]
 name = "rich_range"

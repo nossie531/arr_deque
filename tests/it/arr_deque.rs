@@ -1399,8 +1399,8 @@ fn eq() {
     fn when_arr_ref() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
             let master = ch::master(&target);
-            let asis = target.eq(&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
-            let tobe = master.eq(&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let asis = target.eq(&&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&&tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
             assert_eq!(asis, tobe);
         }
     }
@@ -1408,8 +1408,8 @@ fn eq() {
     fn when_arr_mut() {
         for [target, other] in ts::deque_pairs::all_for_cmp_normal() {
             let master = ch::master(&target);
-            let asis = target.eq(&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
-            let tobe = master.eq(&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let asis = target.eq(&&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
+            let tobe = master.eq(&&mut tu::to_array::<_, { ts::NORMAL_LEN }>(other.clone()));
             assert_eq!(asis, tobe);
         }
     }

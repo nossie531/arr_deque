@@ -12,12 +12,13 @@ categories = ["no-std", "data-structures"]
 [dependencies]
 rich_range = "0.5"
 subject = "0.2"
+rerun_on_panic = "0.1"
 
 [dev-dependencies]
 rand = "0.10"
 rand_pcg = "0.10"
 test_panic = "0.9"
-drop_tracer = { path = "../drop_tracer" }
+drop_tracer = "0.7"
 
 [features]
 default = ["std"]
