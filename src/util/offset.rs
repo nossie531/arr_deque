@@ -18,7 +18,7 @@ impl Offset {
         Self { dir, len }
     }
 
-    /// Creates a new ofsset from `x` to `y`.
+    /// Creates a new offset from `x` to `y`.
     pub fn measure(x: usize, y: usize) -> Self {
         Self::new(Dir::inc(x < y), x.abs_diff(y))
     }

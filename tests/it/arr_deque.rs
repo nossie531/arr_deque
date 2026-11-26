@@ -3,7 +3,7 @@ use arr_deque::prelude::*;
 use drop_tracer::prelude::*;
 use std::io::{BufRead, Read, Write};
 use std::mem;
-use std::ops::{Index, IndexMut};
+use std::ops::{Deref, Index, IndexMut};
 use std::rc::Rc;
 use test_panic::TestPanicResult;
 use test_panic::prelude::*;
@@ -35,7 +35,7 @@ fn is_empty() {
 
 #[test]
 fn contains() {
-    let targets = ts::deques::all_for_contains();
+    let targets = ts::deques::all_for_contains().map(Rc::new);
     let patterns = ts::deque_vs::each_contains_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
@@ -124,8 +124,8 @@ fn back_mut() {
 
 #[test]
 fn get() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
     for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
         let master = ch::master(target);
@@ -139,10 +139,11 @@ fn get() {
 
 #[test]
 fn get_mut() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         // Act.
         let asis = target.get_mut(index);
@@ -204,7 +205,7 @@ fn iter_mut() {
 
 #[test]
 fn range() {
-    let targets = ts::deques::all_for_binary_search();
+    let targets = ts::deques::all_for_binary_search().map(Rc::new);
     let patterns = ts::deque_vs::each_ranges;
     for (ref target, range) in targets.flat_map(patterns) {
         // Arrange.
@@ -220,10 +221,11 @@ fn range() {
 
 #[test]
 fn range_mut() {
-    let targets = ts::deques::all_for_binary_search();
+    let targets = ts::deques::all_for_binary_search().map(Rc::new);
     let patterns = ts::deque_vs::each_ranges;
-    for (ref mut target, range) in targets.flat_map(patterns) {
+    for (ref target, range) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
 
         // Act.
@@ -238,7 +240,7 @@ fn range_mut() {
 
 #[test]
 fn partition_point() {
-    let targets = ts::deques::all_for_binary_search();
+    let targets = ts::deques::all_for_binary_search().map(Rc::new);
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
@@ -254,7 +256,7 @@ fn partition_point() {
 
 #[test]
 fn binary_search() {
-    let targets = ts::deques::all_for_binary_search();
+    let targets = ts::deques::all_for_binary_search().map(Rc::new);
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
@@ -266,7 +268,7 @@ fn binary_search() {
 
         // Assert.
         // Note: Do not use simple comparing like `assert_eqn!(asis, tobe)`.
-        // Because result is ambigous if same values exists in deque.
+        // Because result is ambiguous if same values exists in deque.
         assert_eq!(asis.is_ok(), tobe.is_ok());
         assert!(asis.is_err() || target[asis.unwrap()] == key);
     }
@@ -274,7 +276,7 @@ fn binary_search() {
 
 #[test]
 fn binary_search_by() {
-    let targets = ts::deques::all_for_binary_search();
+    let targets = ts::deques::all_for_binary_search().map(Rc::new);
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
@@ -287,7 +289,7 @@ fn binary_search_by() {
 
         // Assert.
         // Note: Do not use simple comparing like `assert_eqn!(asis, tobe)`.
-        // Because result is ambigous if same values exists in deque.
+        // Because result is ambiguous if same values exists in deque.
         assert_eq!(asis.is_ok(), tobe.is_ok());
         assert!(asis.is_err() || target[asis.unwrap()] == key);
     }
@@ -295,7 +297,7 @@ fn binary_search_by() {
 
 #[test]
 fn binary_search_by_key() {
-    let targets = ts::deques::all_for_binary_search();
+    let targets = ts::deques::all_for_binary_search().map(Rc::new);
     let patterns = ts::deque_vs::each_search_keys;
     for (target, key) in targets.flat_map(patterns) {
         // Arrange.
@@ -308,7 +310,7 @@ fn binary_search_by_key() {
 
         // Assert.
         // Note: Do not use simple comparing like `assert_eqn!(asis, tobe)`.
-        // Because result is ambigous if same values exists in deque.
+        // Because result is ambiguous if same values exists in deque.
         assert_eq!(asis.is_ok(), tobe.is_ok());
         assert!(asis.is_err() || target[asis.unwrap()] == key);
     }
@@ -406,10 +408,11 @@ fn pop_back() {
 
 #[test]
 fn pop_front_if() {
-    let targets = ts::deques::all_of();
+    let targets = ts::deques::all_of().map(Rc::new);
     let patterns = ts::deque_vs::each_predicates_mut;
-    for (ref mut target, predicate) in targets.flat_map(patterns) {
+    for (ref target, predicate) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -440,10 +443,11 @@ fn pop_front_if() {
 
 #[test]
 fn pop_back_if() {
-    let targets = ts::deques::all_of();
+    let targets = ts::deques::all_of().map(Rc::new);
     let patterns = ts::deque_vs::each_predicates_mut;
-    for (ref mut target, predicate) in targets.flat_map(patterns) {
+    for (ref target, predicate) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -584,10 +588,11 @@ fn push_back_mut() {
 
 #[test]
 fn remove() {
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -622,10 +627,11 @@ fn insert_xxx() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::looses();
-        let patterns = ts::deque_vs::each_indicies;
-        for (ref mut target, index) in targets.flat_map(patterns) {
+        let targets = ts::deques::looses().map(Rc::new);
+        let patterns = ts::deque_vs::each_indices;
+        for (ref target, index) in targets.flat_map(patterns) {
             // Arrange.
+            let target = &mut target.deref().clone();
             let master = &mut ch::master(&target);
             // Act.
             let asis = test_panic(|| target.insert_mut(index, ts::VAL));
@@ -648,10 +654,11 @@ fn insert_xxx() {
 
 #[test]
 fn swap() {
-    let targets = ts::deques::looses();
+    let targets = ts::deques::looses().map(Rc::new);
     let patterns = ts::deque_vs::each_index_pairs;
-    for (ref mut target, i, j) in targets.flat_map(patterns) {
+    for (ref target, i, j) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         // Act.
         let asis = test_panic(|| target.swap(i, j));
@@ -664,10 +671,11 @@ fn swap() {
 
 #[test]
 fn swap_remove_front() {
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -698,10 +706,11 @@ fn swap_remove_front() {
 
 #[test]
 fn swap_remove_back() {
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -732,10 +741,11 @@ fn swap_remove_back() {
 
 #[test]
 fn rotate_left() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
         // Act.
         let asis = test_panic(|| target.rotate_left(index));
@@ -748,10 +758,11 @@ fn rotate_left() {
 
 #[test]
 fn rotate_right() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
         // Act.
         let asis = test_panic(|| target.rotate_right(index));
@@ -764,10 +775,11 @@ fn rotate_right() {
 
 #[test]
 fn truncate() {
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, len) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, len) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -791,10 +803,11 @@ fn truncate() {
 
 #[test]
 fn retain_back() {
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, len) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, len) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -818,10 +831,11 @@ fn retain_back() {
 
 #[test]
 fn split_off() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
         // Act.
         let asis = test_panic(|| target.split_off(index));
@@ -872,11 +886,12 @@ fn resize() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all_with_bomb();
-        let patterns = ts::deque_vs::each_indicies_more;
-        for (mut target, len) in targets.flat_map(patterns) {
+        let targets = ts::deques::all_with_bomb().map(Rc::new);
+        let patterns = ts::deque_vs::each_indices_more;
+        for (ref target, len) in targets.flat_map(patterns) {
             // Arrange.
-            let mut master = ch::master(&target);
+            let target = &mut target.deref().clone();
+            let master = &mut ch::master(&target);
             let target_tracer = &DropTracer::new();
             let master_tracer = &DropTracer::new();
             let target_tags = tu::tag_map(target.iter());
@@ -910,10 +925,11 @@ fn resize_with() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all_with_bomb();
-        let patterns = ts::deque_vs::each_indicies_more;
-        for (ref mut target, len) in targets.flat_map(patterns) {
+        let targets = ts::deques::all_with_bomb().map(Rc::new);
+        let patterns = ts::deque_vs::each_indices_more;
+        for (ref target, len) in targets.flat_map(patterns) {
             // Arrange.
+            let target = &mut target.deref().clone();
             let master = &mut ch::master(target);
             let target_tracer = &DropTracer::new();
             let master_tracer = &DropTracer::new();
@@ -944,10 +960,11 @@ fn resize_with() {
 
 #[test]
 fn retain_xxx() {
-    let targets = ts::deques::all_with_bomb();
+    let targets = ts::deques::all_with_bomb().map(Rc::new);
     let patterns = ts::deque_vs::each_predicates;
-    for (ref mut target, f) in targets.flat_map(patterns) {
+    for (ref target, f) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
         let target_tracer = &DropTracer::new();
         let master_tracer = &DropTracer::new();
@@ -970,10 +987,11 @@ fn retain_xxx() {
 
 #[test]
 fn drain() {
-    let targets = ts::deques::all();
+    let targets = ts::deques::all().map(Rc::new);
     let patterns = ts::deque_vs::each_ranges;
-    for (ref mut target, range) in targets.flat_map(patterns) {
+    for (ref target, range) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(target);
 
         // Act.
@@ -1027,10 +1045,11 @@ fn adjust_ring_start() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all();
+        let targets = ts::deques::all().map(Rc::new);
         let patterns = ts::deque_vs::each_ring_starts;
-        for (ref mut target, position) in targets.flat_map(patterns) {
+        for (ref target, position) in targets.flat_map(patterns) {
             // Arrange.
+            let target = &mut target.deref().clone();
             let saved = target.clone();
             // Act.
             target.adjust_ring_start(position);
@@ -1056,7 +1075,7 @@ fn adjust_ring_start() {
 #[test]
 fn clone() {
     when_normal();
-    when_cannot_bitcopy();
+    when_cannot_bit_copy();
 
     fn when_normal() {
         for target in ts::deques::all() {
@@ -1065,7 +1084,7 @@ fn clone() {
         }
     }
 
-    fn when_cannot_bitcopy() {
+    fn when_cannot_bit_copy() {
         // Arrange.
         let target = &mut ts::deque::empty_of();
         let value = Rc::new(ts::VAL);
@@ -1269,10 +1288,11 @@ fn hash() {
 
 #[test]
 fn index() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
     for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = target.deref();
         let master = &ch::master(&target);
         // Act.
         let asis = test_panic(|| Index::index(target, index));
@@ -1284,10 +1304,11 @@ fn index() {
 
 #[test]
 fn index_mut() {
-    let targets = ts::deques::all();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, index) in targets.flat_map(patterns) {
+    let targets = ts::deques::all().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, index) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         // Act.
         let asis = test_panic(|| IndexMut::index_mut(target, index));
@@ -1433,10 +1454,11 @@ fn read() {
     // This is because the amount of data read by `VecDeque::read` depends
     // on the buffer split position, which allows for some flexibility.
     // As a result, comparing the results becomes unreliable.
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies;
-    for (ref mut target, buf_len) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices;
+    for (ref target, buf_len) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let buf = &mut tu::buf(buf_len);
         let to_read = Vec::from_iter(target.as_slices().0.iter().cloned());
         // Act.
@@ -1456,11 +1478,12 @@ fn write() {
     when_capacity_over();
 
     fn when_normal() {
-        let targets = ts::deques::all_of();
-        let patterns = ts::deque_vs::each_indicies;
-        let cond = |x: &(ArrDeque<u8, 30>, usize)| x.0.len() + x.1 <= x.0.capacity();
-        for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
+        let targets = ts::deques::all_of().map(Rc::new);
+        let patterns = ts::deque_vs::each_indices;
+        let cond = |x: &(Rc<ArrDeque<u8, 30>>, usize)| x.0.len() + x.1 <= x.0.capacity();
+        for (ref target, buf_len) in targets.flat_map(patterns).filter(cond) {
             // Arrange.
+            let target = &mut target.deref().clone();
             let master = &mut ch::master(&target);
             let buf = &tu::random_vec(buf_len);
             // Act.
@@ -1473,11 +1496,12 @@ fn write() {
     }
 
     fn when_capacity_over() {
-        let targets = ts::deques::all_of();
-        let patterns = ts::deque_vs::each_indicies;
-        let cond = |x: &(ArrDeque<u8, 30>, usize)| x.0.len() + x.1 > x.0.capacity();
-        for (ref mut target, buf_len) in targets.flat_map(patterns).filter(cond) {
+        let targets = ts::deques::all_of().map(Rc::new);
+        let patterns = ts::deque_vs::each_indices;
+        let cond = |x: &(Rc<ArrDeque<u8, 30>>, usize)| x.0.len() + x.1 > x.0.capacity();
+        for (ref target, buf_len) in targets.flat_map(patterns).filter(cond) {
             // Arrange.
+            let target = &mut target.deref().clone();
             let memo = target.clone();
             let buf = &tu::random_vec(buf_len);
             // Act.
@@ -1515,10 +1539,11 @@ fn fill_buf() {
 
 #[test]
 fn consume() {
-    let targets = ts::deques::all_of();
-    let patterns = ts::deque_vs::each_indicies_more;
-    for (ref mut target, amt) in targets.flat_map(patterns) {
+    let targets = ts::deques::all_of().map(Rc::new);
+    let patterns = ts::deque_vs::each_indices_more;
+    for (ref target, amt) in targets.flat_map(patterns) {
         // Arrange.
+        let target = &mut target.deref().clone();
         let master = &mut ch::master(&target);
         // Act.
         let asis = test_panic(|| target.consume(amt));

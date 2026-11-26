@@ -12,12 +12,12 @@ pub enum Dir {
 }
 
 impl Dir {
-    /// Create a decreasing value if given falg is true.
+    /// Create a decreasing value if given flag is true.
     pub fn dec(value: bool) -> Self {
         if value { Self::Dec } else { Self::Inc }
     }
 
-    /// Create a increasing value if given falg is true.
+    /// Create an increasing value if given flag is true.
     pub fn inc(value: bool) -> Self {
         if value { Self::Inc } else { Self::Dec }
     }

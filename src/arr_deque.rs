@@ -899,7 +899,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     ///
     /// # Panics
     ///
-    /// Panics if any of the following cases occured.
+    /// Panics if any of the following cases occurred.
     ///
     /// - Same situations in [`VecDeque::insert`].
     /// - The number of elements exceeds the capacity.
@@ -931,7 +931,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
     ///
     /// # Panics
     ///
-    /// Panics if any of the following cases occured.
+    /// Panics if any of the following cases occurred.
     ///
     /// - Same situations in [`VecDeque::insert_mut`].
     /// - The number of elements exceeds the capacity.
@@ -1188,7 +1188,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         // Shrink the length by amount of moved.
         self.len = at;
 
-        // Retuns deque that contains copied values.
+        // Returns deque that contains copied values.
         other
     }
 
@@ -1375,7 +1375,7 @@ impl<T, const N: usize> ArrDeque<T, N> {
         self.truncate(count);
     }
 
-    /// Removes elements in the given range by returned iterataor.
+    /// Removes elements in the given range by returned iterator.
     ///
     /// See [`VecDeque::drain`].
     ///

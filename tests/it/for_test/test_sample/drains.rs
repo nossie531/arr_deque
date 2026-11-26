@@ -1,7 +1,6 @@
+use crate::for_test::*;
 use rand::distr::{Distribution, StandardUniform};
 use std::iter;
-
-use crate::for_test::*;
 
 pub fn all() -> impl Iterator<Item = ts::DrainBuilder<ts::Val>> {
     all_of()

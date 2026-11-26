@@ -8,7 +8,7 @@ pub(crate) mod iters;
 
 pub(crate) use deque_builder::*;
 pub(crate) use drain_builder::*;
-pub(crate) use funcs::*;
+pub(crate) use fns::*;
 pub(crate) use iter_builder::*;
 pub(crate) use trace_val_nt::*;
 
@@ -31,14 +31,16 @@ pub type SampleDequeGen<T> = arr_deque::ArrDeque<T, CAPACITY>;
 pub type SampleIntoIter<T> = arr_deque::IntoIter<T, CAPACITY>;
 pub type SampleIter<'a, T> = arr_deque::Iter<'a, T>;
 pub type SampleIterMut<'a, T> = arr_deque::IterMut<'a, T>;
+pub type SampleDrain<'a, T> = arr_deque::Drain<'a, T, CAPACITY>;
 pub type MasterDeque = std::collections::vec_deque::VecDeque<Val>;
 pub type MasterDequeGen<T> = std::collections::vec_deque::VecDeque<T>;
 pub type MasterIntoIter<T> = std::collections::vec_deque::IntoIter<T>;
 pub type MasterIter<'a, T> = std::collections::vec_deque::Iter<'a, T>;
 pub type MasterIterMut<'a, T> = std::collections::vec_deque::IterMut<'a, T>;
+pub type MasterDrain<'a, T> = std::collections::vec_deque::Drain<'a, T>;
 
 mod deque_builder;
 mod drain_builder;
-mod funcs;
+mod fns;
 mod iter_builder;
 mod trace_val_nt;

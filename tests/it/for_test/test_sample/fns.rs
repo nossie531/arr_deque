@@ -1,27 +1,27 @@
 use crate::for_test::*;
 use std::ops::{Range, Rem};
 
-pub fn indicies(len: usize) -> impl Iterator<Item = usize> {
+pub fn indices(len: usize) -> impl Iterator<Item = usize> {
     const PLUS_ALPHA: usize = 3;
-    let insides = indicies_inside(len);
-    let outsides = indicies_outside(len, len + PLUS_ALPHA);
+    let insides = indices_inside(len);
+    let outsides = indices_outside(len, len + PLUS_ALPHA);
     insides.chain(outsides)
 }
 
-pub fn indicies_more(len: usize, capacity: usize) -> impl Iterator<Item = usize> {
+pub fn indices_more(len: usize, capacity: usize) -> impl Iterator<Item = usize> {
     assert!(len <= capacity);
-    let insides = indicies_inside(len);
-    let outsides = indicies_outside(len, capacity);
+    let insides = indices_inside(len);
+    let outsides = indices_outside(len, capacity);
     insides.chain(outsides)
 }
 
-pub fn indicies_inside(len: usize) -> impl Iterator<Item = usize> {
+pub fn indices_inside(len: usize) -> impl Iterator<Item = usize> {
     const SEPARATE_COUNT: usize = 5;
     let count = if len > 0 { SEPARATE_COUNT } else { 0 };
     (0..count).map(move |i| tu::step_index(i, len, SEPARATE_COUNT))
 }
 
-pub fn indicies_outside(len: usize, max: usize) -> impl Iterator<Item = usize> {
+pub fn indices_outside(len: usize, max: usize) -> impl Iterator<Item = usize> {
     assert!(len <= max);
     let normal_ob_index = len;
     let insert_ob_index = (len + 1).min(max);
@@ -30,8 +30,8 @@ pub fn indicies_outside(len: usize, max: usize) -> impl Iterator<Item = usize> {
 }
 
 pub fn index_pairs(len: usize) -> impl Iterator<Item = (usize, usize)> {
-    let indicies = indicies(len).collect::<Vec<_>>();
-    tu::cross_iter(indicies)
+    let indices = indices(len).collect::<Vec<_>>();
+    tu::cross_iter(indices)
 }
 
 pub fn ranges(len: usize) -> impl Iterator<Item = Range<usize>> {
@@ -41,7 +41,7 @@ pub fn ranges(len: usize) -> impl Iterator<Item = Range<usize>> {
 }
 
 pub fn ranges_inside(len: usize) -> impl Iterator<Item = Range<usize>> {
-    let indicies = indicies_inside(len).collect::<Vec<_>>();
+    let indicies = indices_inside(len).collect::<Vec<_>>();
     tu::cross_iter(indicies)
         .map(|(s, e)| s..e)
         .filter(|r| !r.is_empty())

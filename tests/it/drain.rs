@@ -1,5 +1,5 @@
 use crate::for_test::*;
-use drop_tracer::DropTracer;
+use drop_tracer::prelude::*;
 use std::mem;
 use test_panic::prelude::*;
 
@@ -60,7 +60,7 @@ fn size_hint() {
 #[test]
 fn drop() {
     for builder in ts::drains::all_with_bomb() {
-        // Arrange enviroments.
+        // Arrange environments.
         let mut builder = tu::dup(builder);
         let target_deque = builder.0.target_deque_mut();
         let master_deque = builder.1.master_deque_mut();

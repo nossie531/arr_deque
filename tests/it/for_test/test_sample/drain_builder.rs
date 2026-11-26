@@ -1,6 +1,4 @@
 use crate::for_test::*;
-use arr_deque::*;
-use std::collections::vec_deque::Drain as Master;
 use std::ops::Range;
 
 #[derive(Clone)]
@@ -76,14 +74,14 @@ impl<T> DrainBuilder<T> {
         &self.range
     }
 
-    pub fn build_target(&mut self) -> Drain<'_, T, { ts::CAPACITY }> {
+    pub fn build_target(&mut self) -> ts::SampleDrain<'_, T> {
         let deque = &mut self.arr_deque;
         let range = self.range.clone();
         let result = deque.drain(range.clone());
         tu::skip_iter(result, self.head_skip, self.tail_skip)
     }
 
-    pub fn build_master(&mut self) -> Master<'_, T> {
+    pub fn build_master(&mut self) -> ts::MasterDrain<'_, T> {
         let deque = &mut self.vec_deque;
         let range = self.range.clone();
         let result = deque.drain(range.clone());

@@ -1,73 +1,76 @@
 use crate::for_test::*;
 use std::ops::{Range, Rem};
+use std::rc::Rc;
 
-pub fn each_ring_starts(deque: ts::SampleDeque) -> impl Iterator<Item = (ts::SampleDeque, usize)> {
+pub fn each_ring_starts(
+    deque: Rc<ts::SampleDeque>,
+) -> impl Iterator<Item = (Rc<ts::SampleDeque>, usize)> {
     ch::RingBufAlign::all().map(move |x| {
         let n = x.calc_ring_start(deque.len(), deque.capacity());
-        (deque.clone(), n)
+        (Rc::clone(&deque), n)
     })
 }
 
-pub fn each_indicies<T>(
-    deque: ts::SampleDequeGen<T>,
-) -> impl Iterator<Item = (ts::SampleDequeGen<T>, usize)>
+pub fn each_indices<T>(
+    deque: Rc<ts::SampleDequeGen<T>>,
+) -> impl Iterator<Item = (Rc<ts::SampleDequeGen<T>>, usize)>
 where
     T: Clone,
 {
-    ts::indicies(deque.len()).map(move |i| (deque.clone(), i))
+    ts::indices(deque.len()).map(move |i| (Rc::clone(&deque), i))
 }
 
-pub fn each_indicies_more<T>(
-    deque: ts::SampleDequeGen<T>,
-) -> impl Iterator<Item = (ts::SampleDequeGen<T>, usize)>
+pub fn each_indices_more<T>(
+    deque: Rc<ts::SampleDequeGen<T>>,
+) -> impl Iterator<Item = (Rc<ts::SampleDequeGen<T>>, usize)>
 where
     T: Clone,
 {
-    ts::indicies_more(deque.len(), deque.capacity()).map(move |i| (deque.clone(), i))
+    ts::indices_more(deque.len(), deque.capacity()).map(move |i| (Rc::clone(&deque), i))
 }
 
 pub fn each_index_pairs<T>(
-    deque: ts::SampleDequeGen<T>,
-) -> impl Iterator<Item = (ts::SampleDequeGen<T>, usize, usize)>
+    deque: Rc<ts::SampleDequeGen<T>>,
+) -> impl Iterator<Item = (Rc<ts::SampleDequeGen<T>>, usize, usize)>
 where
     T: Clone,
 {
-    ts::index_pairs(deque.len()).map(move |(i, j)| (deque.clone(), i, j))
+    ts::index_pairs(deque.len()).map(move |(i, j)| (Rc::clone(&deque), i, j))
 }
 
 pub fn each_ranges<T>(
-    deque: ts::SampleDequeGen<T>,
-) -> impl Iterator<Item = (ts::SampleDequeGen<T>, Range<usize>)>
+    deque: Rc<ts::SampleDequeGen<T>>,
+) -> impl Iterator<Item = (Rc<ts::SampleDequeGen<T>>, Range<usize>)>
 where
     T: Clone,
 {
-    ts::ranges(deque.len()).map(move |r| (deque.clone(), r))
+    ts::ranges(deque.len()).map(move |r| (Rc::clone(&deque), r))
 }
 
 pub fn each_predicates<T>(
-    deque: ts::SampleDequeGen<T>,
-) -> impl Iterator<Item = (ts::SampleDequeGen<T>, Box<dyn Fn(&T) -> bool>)>
+    deque: Rc<ts::SampleDequeGen<T>>,
+) -> impl Iterator<Item = (Rc<ts::SampleDequeGen<T>>, Box<dyn Fn(&T) -> bool>)>
 where
     T: Clone,
     for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
 {
-    ts::predicates().map(move |f| (deque.clone(), f))
+    ts::predicates().map(move |f| (Rc::clone(&deque), f))
 }
 
 pub fn each_predicates_mut<T>(
-    deque: ts::SampleDequeGen<T>,
-) -> impl Iterator<Item = (ts::SampleDequeGen<T>, Box<dyn Fn(&mut T) -> bool>)>
+    deque: Rc<ts::SampleDequeGen<T>>,
+) -> impl Iterator<Item = (Rc<ts::SampleDequeGen<T>>, Box<dyn Fn(&mut T) -> bool>)>
 where
     T: Clone,
     for<'a> &'a T: Rem<&'a ts::Val, Output = ts::Val>,
 {
-    ts::predicates_mut().map(move |f| (deque.clone(), f))
+    ts::predicates_mut().map(move |f| (Rc::clone(&deque), f))
 }
 
 pub fn each_contains_keys(
-    deque: ts::SampleDeque,
-) -> impl Iterator<Item = (ts::SampleDeque, ts::Val)> {
-    let keys_matched = ts::indicies_inside(deque.len())
+    deque: Rc<ts::SampleDeque>,
+) -> impl Iterator<Item = (Rc<ts::SampleDeque>, ts::Val)> {
+    let keys_matched = ts::indices_inside(deque.len())
         .map(|i| deque[i])
         .collect::<Vec<_>>();
 
@@ -80,13 +83,13 @@ pub fn each_contains_keys(
     };
 
     let keys_all = keys_matched.into_iter().chain(keys_unmatched);
-    keys_all.map(move |k| (deque.clone(), k))
+    keys_all.map(move |k| (Rc::clone(&deque), k))
 }
 
 pub fn each_search_keys(
-    deque: ts::SampleDeque,
-) -> impl Iterator<Item = (ts::SampleDeque, ts::Val)> {
-    let keys_matched = ts::indicies_inside(deque.len())
+    deque: Rc<ts::SampleDeque>,
+) -> impl Iterator<Item = (Rc<ts::SampleDeque>, ts::Val)> {
+    let keys_matched = ts::indices_inside(deque.len())
         .map(|i| deque[i])
         .collect::<Vec<_>>();
 

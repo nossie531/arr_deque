@@ -55,14 +55,14 @@ pub fn all_for_cmp_float() -> impl Iterator<Item = [ts::SampleDequeFloat; 2]> {
         x[0].push_back(0.);
     });
 
-    let vs_large_val = ts::indicies_inside(ts::NORMAL_LEN).map(move |i| {
+    let vs_large_val = ts::indices_inside(ts::NORMAL_LEN).map(move |i| {
         let mut pair = pair_for_cmp_float();
         pair[0][i] = 0.;
         pair[1][i] = 1.;
         pair
     });
 
-    let vs_small_val = ts::indicies_inside(ts::NORMAL_LEN).map(move |i| {
+    let vs_small_val = ts::indices_inside(ts::NORMAL_LEN).map(move |i| {
         let mut pair = pair_for_cmp_float();
         pair[0][i] = 1.;
         pair[1][i] = 0.;
