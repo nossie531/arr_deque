@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Build error at core enviroment.
+- Build error at core environment.
 
 ### Changed
 
@@ -79,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `ArrDeque::clone` (NG: bit copy, not clone)
+- `ArrDeque::clone` (NG: copy, not clone)
 - `ArrDeque::drop` and `Drain::drop` (NG: double free) 
 
 ## [0.2.0] - 2026-06-18

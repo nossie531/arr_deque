@@ -7,14 +7,14 @@ use crate::*;
 use core::ops::{Bound, Range, RangeBounds, RangeTo};
 use rich_range::prelude::*;
 
-/// Returns offset value modulared by `m`.
+/// Returns offset value modulated by `m`.
 pub(crate) fn offset_mod(value: usize, offset: Offset, m: usize) -> usize {
     let flag = offset.dir().is_inc();
     let func = if flag { add_mod } else { sub_mod };
     func(value, offset.len(), m)
 }
 
-/// Returns `x + y` value modulared by `m`.
+/// Returns `x + y` value modulated by `m`.
 pub(crate) fn add_mod(x: usize, y: usize, m: usize) -> usize {
     let (val, ovf) = x.overflowing_add(y);
     if !ovf {
@@ -24,7 +24,7 @@ pub(crate) fn add_mod(x: usize, y: usize, m: usize) -> usize {
     }
 }
 
-/// Returns `x - y` value modulared by `m`.
+/// Returns `x - y` value modulated by `m`.
 pub(crate) fn sub_mod(x: usize, y: usize, m: usize) -> usize {
     let (val, ovf) = x.overflowing_sub(y);
     if !ovf {
@@ -34,7 +34,7 @@ pub(crate) fn sub_mod(x: usize, y: usize, m: usize) -> usize {
     }
 }
 
-/// Returns the two cutted ranges.
+/// Returns the two cut ranges.
 pub(crate) fn range_cut(range: &Range<usize>, pos: usize) -> [Range<usize>; 2] {
     let ranges = rw::refr(range).cut(&pos);
     let rx = ranges.0.unwrap_or_default().try_into().unwrap();
