@@ -18,7 +18,7 @@ rerun_on_panic = "0.1"
 rand = "0.10"
 rand_pcg = "0.10"
 test_panic = "0.9"
-drop_tracer = "0.7"
+drop_tracer = "0.9"
 
 [features]
 default = ["std"]

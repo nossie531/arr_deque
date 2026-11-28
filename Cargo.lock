@@ -49,9 +49,9 @@ dependencies = [
 
 [[package]]
 name = "drop_tracer"
-version = "0.7.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3dc07641094b02ae0989313b234b4626846eec22b31909605f9c3c100cd810b9"
+checksum = "2a65cf00a4e079071a41e688599344fca24a75cc32f2e3fec612415bdcf75dce"
 dependencies = [
  "parking_lot",
 ]
